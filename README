@@ -1,8 +1,18 @@
 WeeWikiPaint
 
 Pre-requisites:
+- git is installed.
 - node.js is installed.
 
-Build:
+=====
+BUILD
+=====
+
+Unix:
 1. $ npm install   # installs all dependencies
 2. $ ./jake.sh     # runs the default jake task (which does the build)
+
+Windows
+1. $ git clone <repo-url>
+2.
+
