@@ -1,0 +1,23 @@
+WeeWikiPaint
+
+Minimum Marketable Feature:
+* marketing home page
+- collaborative painting page (very basic)
+- wikify pages
+- more complex painting
+- more collaborative features
+- collaborative painting wiki
+
+User Stories:
+* "hello world" server
+- "hello world" client (one browser)
+- support multiple browsers
+- marketing copy
+
+Engineering Tasks:
+* automated build
+- static code analysis (Lint)
+- continuous integration
+- server-side testing
+- client-side testing
+
