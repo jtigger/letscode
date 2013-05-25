@@ -1,5 +1,6 @@
 # User-specific IntelliJ IDEA files
 .idea/workspace.xml
+.idea/dictionaries/*
 
 # Instead of versioning the built dependencies using package.json
 # To pull down dependencies, run "npm install" at the project root.
