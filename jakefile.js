@@ -4,15 +4,19 @@
 desc("Full build.");
 task("default", ["lint"]);
 
+
 desc("Runs JSLint (to catch common JavaScript errors).");
-task("lint", function() {
+task("lint", /* jshint latedef: false */ function() {
   var lint_runner = require("./build/lint/lint_runner.js");
 
   var allJavaScriptSources = new jake.FileList();
   allJavaScriptSources.include("**/*.js");
   allJavaScriptSources.exclude("node_modules");  // assuming these are properly linted, already.
+  lint_runner.validateFileList(allJavaScriptSources, getJSHintOptions());
+});
 
-  var options = {
+function getJSHintOptions() {
+  return {
     bitwise: false,
     curly: true,
     eqeqeq: true,
@@ -30,7 +34,5 @@ task("lint", function() {
     maxcomplexity: 10,
     node: true
   };
+}
 
-
-  lint_runner.validateFileList(allJavaScriptSources, options);
-});
