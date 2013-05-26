@@ -15,10 +15,10 @@ User Stories:
 - marketing copy
 
 Engineering Tasks:
-- continuous integration
 - server-side testing
 - client-side testing
 
+[x] continuous integration
 [x] static code analysis (Lint)
 [x] automated build
 
