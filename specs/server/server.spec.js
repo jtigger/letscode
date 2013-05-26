@@ -18,7 +18,7 @@ exports.specs = nodeunit.testCase({
     done();
   },
 
-  "There exists an HTTP server.": function(test) {
+  "Server responds to HTTP GET requests.": function(test) {
     test.expect(1);
 
     http.get("http://localhost:" + port, function(response) {
