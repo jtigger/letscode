@@ -15,10 +15,20 @@ User Stories:
 - marketing copy
 
 Engineering Tasks:
-- continuous integration
-- server-side testing
+* server-side testing
 - client-side testing
 
+Current To Dos:
+- add a "LICENSE.txt" file
+
+Future Ideas:
+- abstract it
+- swap out for a different framework to make sure it works
+
+
+DONE:
+[x] get unit testing working
+[x] continuous integration
 [x] static code analysis (Lint)
 [x] automated build
 

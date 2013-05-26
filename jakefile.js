@@ -2,7 +2,7 @@
 "use strict";
 
 desc("Full build.");
-task("default", ["lint"]);
+task("default", ["lint", "test"]);
 
 
 desc("Runs JSLint (to catch common JavaScript errors).");
@@ -15,6 +15,12 @@ task("lint", /* jshint latedef: false */ function() {
   var passesLint = lint_runner.validateFileList(allJavaScriptSources, getJSHintOptions());
 
   if(!passesLint) { fail("Task 'lint' failed (see above)."); }
+});
+
+desc("Runs unit tests.");
+task("test", function() {
+  var reporter = require('nodeunit').reporters.default;
+  reporter.run(['specs/server/server.spec.js']);
 });
 
 desc("Integration");
