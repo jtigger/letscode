@@ -19,10 +19,8 @@ task("lint", /* jshint latedef: false */ function() {
 
 desc("Runs unit tests.");
 task("test", function() {
-  console.log("unit tests run here.");
-  var allTestsPass = false;
-
-  if(!allTestsPass) { fail("Task 'test' failed (see above)."); }
+  var reporter = require('nodeunit').reporters.default;
+  reporter.run(['specs/server/server.spec.js']);
 });
 
 desc("Integration");
