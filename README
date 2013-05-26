@@ -1,8 +1,8 @@
 WeeWikiPaint
 
 Pre-requisites:
-- git is installed.
-- node.js is installed.
+- git (last known good: 1.8.x)
+- node.js (last known good: 0.8.x)
 - running in a bash shell (on Windows, git comes with bash; or use cygwin)
 
 =====
