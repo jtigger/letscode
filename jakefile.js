@@ -20,7 +20,7 @@ task("lint", /* jshint latedef: false */ function() {
 desc("Runs unit tests.");
 task("test", function() {
   var reporter = require('nodeunit').reporters.default;
-  reporter.run(['specs/server/server.spec.js'], null, function(failureOccurred) {
+  reporter.run(['specs/server'], null, function(failureOccurred) {
       if(failureOccurred) { fail("Task 'test' failed (see above)."); }
       complete();
     });
