@@ -19,13 +19,15 @@ Engineering Tasks:
 - client-side testing
 
 Current To Dos:
-- choose a testing framework
+- add a "LICENSE.txt" file
+
+Future Ideas:
 - abstract it
 - swap out for a different framework to make sure it works
-- add a "LICENSE.txt" file
 
 
 DONE:
+[x] get unit testing working
 [x] continuous integration
 [x] static code analysis (Lint)
 [x] automated build
