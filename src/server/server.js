@@ -2,5 +2,5 @@
 "use strict";
 
 exports.number = function() {
-  return 1;
+  return 4;
 };
