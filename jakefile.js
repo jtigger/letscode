@@ -1,4 +1,4 @@
-/* global desc, fail, jake, task */
+/* global complete, desc, fail, jake, task */
 "use strict";
 
 desc("Full build.");
@@ -20,8 +20,11 @@ task("lint", /* jshint latedef: false */ function() {
 desc("Runs unit tests.");
 task("test", function() {
   var reporter = require('nodeunit').reporters.default;
-  reporter.run(['specs/server/server.spec.js']);
-});
+  reporter.run(['specs/server'], null, function(failureOccurred) {
+      if(failureOccurred) { fail("Task 'test' failed (see above)."); }
+      complete();
+    });
+}, {async: true});
 
 desc("Integration");
 task("integrate", ["default"], function() {
