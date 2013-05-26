@@ -15,9 +15,17 @@ User Stories:
 - marketing copy
 
 Engineering Tasks:
-- server-side testing
+* server-side testing
 - client-side testing
 
+Current To Dos:
+- choose a testing framework
+- abstract it
+- swap out for a different framework to make sure it works
+- add a "LICENSE.txt" file
+
+
+DONE:
 [x] continuous integration
 [x] static code analysis (Lint)
 [x] automated build
