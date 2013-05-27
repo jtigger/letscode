@@ -10,13 +10,11 @@ var port = 8000;
 
 exports["Given the server is running"] = nodeunit.testCase({
   setUp: function(done) {
-    httpServer = server.start(port);
-    done();
+    httpServer = server.start(port, done);
   },
 
   tearDown: function(done) {
-    httpServer.stop();
-    done();
+    httpServer.stop(done);
   },
 
   "responds to HTTP GET requests.": function(test) {
@@ -48,24 +46,22 @@ exports["Given the server is running"] = nodeunit.testCase({
 });
 
 exports["Given the server is running and has a virtual-to-physical mapping"] = (function() {
-  var rootDirectory = __dirname + "/../../../build";
+  var rootDirectory = fs.realpathSync(__dirname + "/../../../build");
   var pathname = "somefile";
   var filename = rootDirectory + "/" + pathname + ".html";
 
   return nodeunit.testCase({
     setUp: function(done) {
       fs.writeFileSync(filename, "Hello, world.");
-      httpServer = server.start(port);
-      done();
+      httpServer = server.start(port, done);
     },
 
     tearDown: function(done) {
       fs.unlinkSync(filename);
-      httpServer.stop();
-      done();
+      httpServer.stop(done);
     },
 
-    "when a non-existant file is requested, the server returns a 404": function(test) {
+    "when a non-existant file is requested, the server returns a 404.": function(test) {
       test.expect(1);
 
       http.get("http://localhost:" + port + "/some-non-existant-file", function(response) {
@@ -108,9 +104,9 @@ exports["In general"] = nodeunit.testCase({
     httpServer = server.start(port);
     httpServer.stop(function() {
       callbackCalled = true;
+      test.ok(callbackCalled, "Expected server to invoke the callback on closing.");
+      test.done();
     });
-    test.ok(callbackCalled, "Expected server to invoke the callback on closing.");
-    test.done();
   },
 
   "when stop is called on a stopped server, it throws an exception.": function(test) {

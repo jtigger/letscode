@@ -4,7 +4,9 @@ var http = require("http");
 var url = require("url");
 var fs = require("fs");
 
-exports.start = function(port) {
+// port = which TCP/IP port to listen on.
+// callback = invoked when server is ready to accept connections.
+exports.start = function(port, callback) {
   if (!port) { throw new Error("'port' is not optional."); }
 
   var server = http.createServer();
@@ -16,7 +18,7 @@ exports.start = function(port) {
     if (requestUrl.pathname === "/") {
       response.end("<html><body><h1>Hello, world!</h1></body></html>");
     } else {
-      var fileRootDirectory = __dirname + "/../../../build";
+      var fileRootDirectory = fs.realpathSync(__dirname + "/../../../build");
       var filePathname = requestUrl.pathname;
       var fileExtension = ".html";
       var filename = fileRootDirectory + "/" + filePathname + fileExtension;
@@ -36,13 +38,12 @@ exports.start = function(port) {
       });
     }
   });
-  server.listen(port);
+  server.listen(port, callback);
 
   var wrapper = (function() {
     return {
       "stop": function(callback) {
-        server.close();
-        if (callback) {callback();}
+        server.close(callback);
       }
     };
   })();
