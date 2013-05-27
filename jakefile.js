@@ -8,7 +8,7 @@ desc("Full build.");
 task("default", ["check node version", "clean", "lint", "test"]);
 
 directory(BUILD_DIR);
-directory(TEST_TEMP_DIR, [BUILD_DIR]);
+directory(TEST_TEMP_DIR);
 
 desc("Purges the build output directory (i.e. " + BUILD_DIR + ").");
 task("clean", function() {
