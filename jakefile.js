@@ -1,9 +1,10 @@
-/* global complete, desc, fail, jake, task */
+/* global complete, desc, directory, fail, jake, task */
 "use strict";
 
 desc("Full build.");
 task("default", ["check node version", "lint", "test"]);
 
+directory("build");
 
 desc("Runs JSLint (to catch common JavaScript errors).");
 task("lint", /* jshint latedef: false */ function() {
@@ -18,7 +19,7 @@ task("lint", /* jshint latedef: false */ function() {
 });
 
 desc("Runs unit tests.");
-task("test", function() {
+task("test", ["build"], function() {
   var reporter = require('nodeunit').reporters.default;
   reporter.run(['src/specs/server'], null, function(failureOccurred) {
       if(failureOccurred) { fail("Task 'test' failed (see above)."); }
