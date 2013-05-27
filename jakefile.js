@@ -7,7 +7,7 @@ task("default", ["check node version", "lint", "test"]);
 
 desc("Runs JSLint (to catch common JavaScript errors).");
 task("lint", /* jshint latedef: false */ function() {
-  var lint_runner = require("./build/lint/lint_runner.js");
+  var lint_runner = require("./src/build/lint/lint_runner.js");
 
   var allJavaScriptSources = new jake.FileList();
   allJavaScriptSources.include("**/*.js");
@@ -20,7 +20,7 @@ task("lint", /* jshint latedef: false */ function() {
 desc("Runs unit tests.");
 task("test", function() {
   var reporter = require('nodeunit').reporters.default;
-  reporter.run(['specs/server'], null, function(failureOccurred) {
+  reporter.run(['src/specs/server'], null, function(failureOccurred) {
       if(failureOccurred) { fail("Task 'test' failed (see above)."); }
       complete();
     });

@@ -4,7 +4,7 @@
 var nodeunit = require("nodeunit");
 var http = require("http");
 var fs = require("fs");
-var server = require("../../src/server/server.js");
+var server = require("../../code/server/server.js");
 var httpServer;
 var port = 8000;
 
@@ -48,7 +48,7 @@ exports["Given the server is running"] = nodeunit.testCase({
 });
 
 exports["Given the server is running and has a virtual-to-physical mapping"] = (function() {
-  var rootDirectory = __dirname + "/../../build";
+  var rootDirectory = __dirname + "/../../../build";
   var pathname = "somefile";
   var filename = rootDirectory + "/" + pathname + ".html";
 
