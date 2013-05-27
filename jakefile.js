@@ -1,7 +1,5 @@
 /* global complete, desc, fail, jake, task */
 "use strict";
-var $p = require("procstreams");
-
 
 desc("Full build.");
 task("default", ["check node version", "lint", "test"]);
@@ -59,17 +57,11 @@ function getJSHintOptions() {
 
 task("check node version", function() {
   var expectedNodeVersion = "v0.10.8";
+  var actualNodeVersion = process.version;
 
-  $p("node --version")
-    .data(function(err, stdout) {
-      var version = stdout.toString().trim();
-
-      if(version !== expectedNodeVersion) {
-        fail(version + " is an unsupported version of node.js.  Must be " + expectedNodeVersion);
-      }
-      complete();
-    });
-
-   console.log("node version check");
-}, {async: true});
+  // since node.js is changes quite frequently, making this an exact match, for now.
+  if(actualNodeVersion !== expectedNodeVersion) {
+    fail(actualNodeVersion + " is an unsupported version of node.js.  Must be " + expectedNodeVersion);
+  }
+});
 
