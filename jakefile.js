@@ -1,10 +1,17 @@
 /* global complete, desc, directory, fail, jake, task */
 "use strict";
 
-desc("Full build.");
-task("default", ["check node version", "lint", "test"]);
+var BUILD_DIR = "build";
 
-directory("build");
+desc("Full build.");
+task("default", ["check node version", "clean", "lint", "test"]);
+
+directory(BUILD_DIR);
+
+desc("Purges the build output directory (i.e. " + BUILD_DIR + ").");
+task("clean", function() {
+  jake.rmRf(BUILD_DIR);
+});
 
 desc("Runs JSLint (to catch common JavaScript errors).");
 task("lint", /* jshint latedef: false */ function() {
@@ -19,7 +26,7 @@ task("lint", /* jshint latedef: false */ function() {
 });
 
 desc("Runs unit tests.");
-task("test", ["build"], function() {
+task("test", [BUILD_DIR], function() {
   var reporter = require('nodeunit').reporters.default;
   reporter.run(['src/specs/server'], null, function(failureOccurred) {
       if(failureOccurred) { fail("Task 'test' failed (see above)."); }
