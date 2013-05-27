@@ -1,8 +1,10 @@
 /* global complete, desc, fail, jake, task */
 "use strict";
+var $p = require("procstreams");
+
 
 desc("Full build.");
-task("default", ["lint", "test"]);
+task("default", ["check node version", "lint", "test"]);
 
 
 desc("Runs JSLint (to catch common JavaScript errors).");
@@ -54,4 +56,20 @@ function getJSHintOptions() {
     node: true
   };
 }
+
+task("check node version", function() {
+  var expectedNodeVersion = "v0.10.8";
+
+  $p("node --version")
+    .data(function(err, stdout) {
+      var version = stdout.toString().trim();
+
+      if(version !== expectedNodeVersion) {
+        fail(version + " is an unsupported version of node.js.  Must be " + expectedNodeVersion);
+      }
+      complete();
+    });
+
+   console.log("node version check");
+}, {async: true});
 

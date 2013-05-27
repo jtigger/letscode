@@ -21,12 +21,12 @@ Current To Dos:
 
 
 Future Ideas:
-- build script checks for node version and aborts if it's different than known good.
 - abstract away the test framework (?!?!?)
   - swap out for a different test framework to make sure the abstraction layer works.
 
 
 DONE:
+[x] build script checks for node version and aborts if it's different than known good.
 [x] TDD a specific request/response.
 [x] create a simple webserver
 [x] add a "LICENSE.txt" file
