@@ -3,6 +3,8 @@
 var http = require("http");
 
 exports.start = function(port) {
+  if(!port) { throw new Error("'port' is not optional."); }
+
   var server = http.createServer();
 
   server.on("request", function(request, response) {
@@ -12,7 +14,7 @@ exports.start = function(port) {
 
   var wrapper = (function() {
     return {
-      "close" : function(callback) {
+      "stop" : function(callback) {
         server.close();
         if(callback) {callback();}
       }

@@ -14,7 +14,7 @@ exports["When running"] = nodeunit.testCase({
   },
 
   tearDown: function(done) {
-    httpServer.close();
+    httpServer.stop();
     done();
   },
 
@@ -48,25 +48,35 @@ exports["When running"] = nodeunit.testCase({
 });
 
 exports["."] = nodeunit.testCase({
+  "when started without a port number, throws an exception": function(test) {
+    test.expect(1);
+
+    test.throws(function() {
+      httpServer = server.start();
+    });
+
+    test.done();
+  },
+
   "when stopped, the server invokes the configured callback." : function(test) {
     test.expect(1);
 
     var callbackCalled = false;
     httpServer = server.start(port);
-    httpServer.close(function() {
+    httpServer.stop(function() {
       callbackCalled = true;
     });
     test.ok(callbackCalled, "Expected server to invoke the callback on closing.");
     test.done();
   },
 
-  "when close is called on a stopped server, it throws an exception.": function(test) {
+  "when stop is called on a stopped server, it throws an exception.": function(test) {
     test.expect(1);
 
     httpServer = server.start(port);
-    httpServer.close();
+    httpServer.stop();
     test.throws(function() {
-       httpServer.close();
+       httpServer.stop();
     });
 
     test.done();
