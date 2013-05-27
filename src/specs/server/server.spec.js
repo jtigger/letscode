@@ -27,22 +27,6 @@ exports["Given the server is running"] = nodeunit.testCase({
     });
   },
 
-  "returns 'Hello, world!' in the response": function(test) {
-    test.expect(2);
-
-    http.get("http://localhost:" + port, function(response) {
-      var returnedHTML = "";
-      test.equals(200, response.statusCode, "Expected an HTTP 200 (OK) response.");
-      response.on("data", function(chunk) { returnedHTML += chunk; });
-      response.on("end", function() {
-        var expected = "Hello, world!";
-        var containsExpected = returnedHTML.indexOf(expected) > 0;
-        test.ok(containsExpected, "Expected to find '" + expected + "' in response; response = '" + returnedHTML + "'.");
-        test.done();
-      });
-    });
-
-  }
 });
 
 exports["Given the server is running and has a virtual-to-physical mapping"] = (function() {
