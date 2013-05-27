@@ -7,7 +7,7 @@ var server = require("../../src/server/server.js");
 var httpServer;
 var port = 8000;
 
-exports.server = nodeunit.testCase({
+exports["When running"] = nodeunit.testCase({
   setUp: function(done) {
     httpServer = server.start(port);
     done();
@@ -43,6 +43,33 @@ exports.server = nodeunit.testCase({
       });
     });
 
+  }
+
+});
+
+exports["."] = nodeunit.testCase({
+  "when stopped, the server invokes the configured callback." : function(test) {
+    test.expect(1);
+
+    var callbackCalled = false;
+    httpServer = server.start(port);
+    httpServer.close(function() {
+      callbackCalled = true;
+    });
+    test.ok(callbackCalled, "Expected server to invoke the callback on closing.");
+    test.done();
+  },
+
+  "when close is called on a stopped server, it throws an exception.": function(test) {
+    test.expect(1);
+
+    httpServer = server.start(port);
+    httpServer.close();
+    test.throws(function() {
+       httpServer.close();
+    });
+
+    test.done();
   }
 
 });

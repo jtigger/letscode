@@ -10,5 +10,14 @@ exports.start = function(port) {
   });
   server.listen(port);
 
-  return server;
+  var wrapper = (function() {
+    return {
+      "close" : function(callback) {
+        server.close();
+        if(callback) {callback();}
+      }
+    };
+  })();
+
+  return wrapper;
 };
