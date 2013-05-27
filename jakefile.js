@@ -1,15 +1,14 @@
-/* global complete, desc, fail, jake, task */
+/* global complete, desc, directory, fail, jake, task */
 "use strict";
-var $p = require("procstreams");
-
 
 desc("Full build.");
 task("default", ["check node version", "lint", "test"]);
 
+directory("build");
 
 desc("Runs JSLint (to catch common JavaScript errors).");
 task("lint", /* jshint latedef: false */ function() {
-  var lint_runner = require("./build/lint/lint_runner.js");
+  var lint_runner = require("./src/build/lint/lint_runner.js");
 
   var allJavaScriptSources = new jake.FileList();
   allJavaScriptSources.include("**/*.js");
@@ -20,9 +19,9 @@ task("lint", /* jshint latedef: false */ function() {
 });
 
 desc("Runs unit tests.");
-task("test", function() {
+task("test", ["build"], function() {
   var reporter = require('nodeunit').reporters.default;
-  reporter.run(['specs/server'], null, function(failureOccurred) {
+  reporter.run(['src/specs/server'], null, function(failureOccurred) {
       if(failureOccurred) { fail("Task 'test' failed (see above)."); }
       complete();
     });
@@ -59,17 +58,11 @@ function getJSHintOptions() {
 
 task("check node version", function() {
   var expectedNodeVersion = "v0.10.8";
+  var actualNodeVersion = process.version;
 
-  $p("node --version")
-    .data(function(err, stdout) {
-      var version = stdout.toString().trim();
-
-      if(version !== expectedNodeVersion) {
-        fail(version + " is an unsupported version of node.js.  Must be " + expectedNodeVersion);
-      }
-      complete();
-    });
-
-   console.log("node version check");
-}, {async: true});
+  // since node.js is changes quite frequently, making this an exact match, for now.
+  if(actualNodeVersion !== expectedNodeVersion) {
+    fail(actualNodeVersion + " is an unsupported version of node.js.  Must be " + expectedNodeVersion);
+  }
+});
 

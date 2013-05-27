@@ -9,13 +9,27 @@ Minimum Marketable Feature:
 - collaborative painting wiki
 
 User Stories:
-* "hello world" server
-- "hello world" client (one browser)
-- support multiple browsers
-- marketing copy
+[ ] "Serve the Home page"
+    As a potential customer of WeeWikiPaint
+    I want a short, sweet, attractive splash page to describe the service
+    so that I can quickly understand what the key features of the tool is and how that can help me.
+    (straight static HTML, no CSS)
+
+[ ] "Serve 404s for all other pages"
+    I want to see a clearly stated 404 page whenever I ask for a file/resource that does not exist,
+    As a visitor to WeeWikiPaint,
+    so that I know when I've entered a bad URL.
+
+[ ] "Ensure 99.9% availability"
+    As a visitor to WeeWikiPaint,
+    I want to go to the site at a publically accessible location with a sensible URL that is available
+    99.9% of the time,
+    allowing me to come to trust the the site as "always there."
+
 
 Engineering Tasks:
-* server-side testing
+[ ] serve up a static page through our server.
+
 
 Current To Dos:
 
@@ -26,6 +40,7 @@ Future Ideas:
 
 
 DONE:
+[x] "hello world" server
 [x] build script checks for node version and aborts if it's different than known good.
 [x] TDD a specific request/response.
 [x] create a simple webserver

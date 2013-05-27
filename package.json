@@ -8,7 +8,6 @@
   "dependencies": {
     "jake": "*",
     "jshint": "*",
-    "nodeunit": "*",
-    "procstreams": "*"
+    "nodeunit": "*"
   }
 }
