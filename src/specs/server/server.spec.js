@@ -46,7 +46,7 @@ exports["Given the server is running"] = nodeunit.testCase({
 });
 
 exports["Given the server is running and has a virtual-to-physical mapping"] = (function() {
-  var rootDirectory = fs.realpathSync(__dirname + "/../../../build");
+  var rootDirectory = fs.realpathSync(__dirname + "/../../../build/test");
   var pathname = "somefile";
   var filename = rootDirectory + "/" + pathname + ".html";
 

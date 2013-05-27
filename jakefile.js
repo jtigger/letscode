@@ -2,11 +2,13 @@
 "use strict";
 
 var BUILD_DIR = "build";
+var TEST_TEMP_DIR = BUILD_DIR + "/test";
 
 desc("Full build.");
 task("default", ["check node version", "clean", "lint", "test"]);
 
 directory(BUILD_DIR);
+directory(TEST_TEMP_DIR, [BUILD_DIR]);
 
 desc("Purges the build output directory (i.e. " + BUILD_DIR + ").");
 task("clean", function() {
@@ -26,7 +28,7 @@ task("lint", /* jshint latedef: false */ function() {
 });
 
 desc("Runs unit tests.");
-task("test", [BUILD_DIR], function() {
+task("test", [TEST_TEMP_DIR], function() {
   var reporter = require('nodeunit').reporters.default;
   reporter.run(['src/specs/server'], null, function(failureOccurred) {
       if(failureOccurred) { fail("Task 'test' failed (see above)."); }

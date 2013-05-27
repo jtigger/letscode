@@ -18,7 +18,7 @@ exports.start = function(port, callback) {
     if (requestUrl.pathname === "/") {
       response.end("<html><body><h1>Hello, world!</h1></body></html>");
     } else {
-      var fileRootDirectory = fs.realpathSync(__dirname + "/../../../build");
+      var fileRootDirectory = fs.realpathSync(__dirname + "/../../../build/test");
       var filePathname = requestUrl.pathname;
       var fileExtension = ".html";
       var filename = fileRootDirectory + "/" + filePathname + fileExtension;
