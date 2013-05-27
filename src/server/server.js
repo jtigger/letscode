@@ -6,7 +6,7 @@ exports.start = function(port) {
   var server = http.createServer();
 
   server.on("request", function(request, response) {
-    response.end("<html><body><h1>hello, world.</h1></body></html>");
+    response.end("<html><body><h1>Hello, world!</h1></body></html>");
   });
   server.listen(port);
 

@@ -7,7 +7,7 @@ var server = require("../../src/server/server.js");
 var httpServer;
 var port = 8000;
 
-exports.specs = nodeunit.testCase({
+exports.server = nodeunit.testCase({
   setUp: function(done) {
     httpServer = server.start(port);
     done();
@@ -18,7 +18,7 @@ exports.specs = nodeunit.testCase({
     done();
   },
 
-  "Server responds to HTTP GET requests.": function(test) {
+  "responds to HTTP GET requests.": function(test) {
     test.expect(1);
 
     http.get("http://localhost:" + port, function(response) {
@@ -26,6 +26,23 @@ exports.specs = nodeunit.testCase({
       response.on("data", function() {});
       test.done();
     });
+  },
+
+  "returns 'Hello, world!' in the response": function(test) {
+    test.expect(2);
+
+    http.get("http://localhost:" + port, function(response) {
+      var returnedHTML = "";
+      test.equals(200, response.statusCode, "Expected an HTTP 200 (OK) response.");
+      response.on("data", function(chunk) { returnedHTML += chunk; });
+      response.on("end", function() {
+        var expected = "Hello, world!";
+        var containsExpected = returnedHTML.indexOf(expected) > 0;
+        test.ok(containsExpected, "Expected to find '" + expected + "' in response; response = '" + returnedHTML + "'.");
+        test.done();
+      });
+    });
+
   }
 
 });

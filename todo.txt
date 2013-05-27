@@ -16,17 +16,18 @@ User Stories:
 
 Engineering Tasks:
 * server-side testing
-- client-side testing
 
 Current To Dos:
-[ ] enforce node version
+
 
 Future Ideas:
-- abstract it
-- swap out for a different framework to make sure it works
+- build script checks for node version and aborts if it's different than known good.
+- abstract away the test framework (?!?!?)
+  - swap out for a different test framework to make sure the abstraction layer works.
 
 
 DONE:
+[x] TDD a specific request/response.
 [x] create a simple webserver
 [x] add a "LICENSE.txt" file
 [x] get unit testing working
