@@ -5,3 +5,6 @@
 # Instead of versioning the built dependencies using package.json
 # To pull down dependencies, run "npm install" at the project root.
 node_modules
+
+# Ignore any generated output from the build
+/build

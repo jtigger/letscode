@@ -8,11 +8,16 @@ var server = require("../../code/server/server.js");
 var httpServer;
 var port = 8000;
 
-function httpGet(url, callback) {
+// complete -- function to invoke when the HTTP GET completes.  This function is passed an instance
+//             of node's http.ServerResponse (http://nodejs.org/api/http.html#http_class_http_serverresponse)
+//             with an additional property named "content" which holds the textual content of the response.
+function httpGet(url, complete) {
   http.get(url, function(response) {
-    response.on("data", function() {} );
+    var content = "";
+    response.on("data", function(chunk) { content += chunk; } );
     response.on("end", function() {
-      callback(response);
+      response.content = content;
+      complete(response);
     });
   });
 }
@@ -39,7 +44,40 @@ exports["Given the server is running"] = nodeunit.testCase({
 
 });
 
-exports["Given the server is running and has a virtual-to-physical mapping"] = (function() {
+exports["Configuring the server"] = nodeunit.testCase({
+
+  tearDown: function(done) {
+    httpServer.stop(done);
+  },
+
+  "when we specify an existing filesystem directory as the web root, the server serves files from that directory" : function(test) {
+    test.expect(1);
+    var webRootDirectory = __dirname + "/../../../build/test/sample-web-root";
+    var pathname = "foo";
+    var filename = webRootDirectory + "/" + pathname + ".html";
+    fs.mkdirSync(webRootDirectory);
+    fs.writeFileSync(filename, "(some HTML)");
+
+    var url = "http://localhost:" + port + "/" + pathname;
+
+    httpServer = server.start(port, webRootDirectory, function() {
+      httpGet(url, function(response) {
+        test.equals(200, response.statusCode, "Expected that a file within the web root directory would be served.");
+        test.done();
+      });
+    });
+  }
+//  ,
+//
+//  "when we specify a non-existant directory as the web root, the server throws an exception": function(test) {
+//    test.expect(1);
+//
+//
+//    test.done();
+//  }
+});
+
+exports["Given the server is running, has a web root configured and has some files"] = (function() {
   var pathname = "somefile";
   var filename;
 
@@ -47,7 +85,6 @@ exports["Given the server is running and has a virtual-to-physical mapping"] = (
     setUp: function(done) {
       httpServer = server.start(port, function() {
         filename = httpServer.rootDirectory + "/" + pathname + ".html";
-        console.log(filename);
         fs.writeFileSync(filename, "Hello, world.");
         done();
       });
@@ -58,15 +95,6 @@ exports["Given the server is running and has a virtual-to-physical mapping"] = (
       httpServer.stop(done);
     },
 
-    "when a non-existant file is requested, the server returns a 404.": function(test) {
-      test.expect(1);
-
-      httpGet("http://localhost:" + port + "/some-non-existant-file", function(response) {
-        test.equals(404, response.statusCode, "Expected an HTTP 404 return code.");
-        test.done();
-      });
-    },
-
     "when an existing file is requested, that file is served." : function(test) {
       test.expect(1);
       var url = "http://localhost:" + port + "/" + pathname;
@@ -75,8 +103,34 @@ exports["Given the server is running and has a virtual-to-physical mapping"] = (
         test.equals(200, response.statusCode, "Expected an HTTP 200 (OK) response; virtual path = " + url + "; file located at " + filename);
         test.done();
       });
+    },
 
+    "when a non-existant file is requested, the server returns a 404 page.": function(test) {
+      test.expect(2);
+
+      httpGet("http://localhost:" + port + "/some-non-existant-file", function(response) {
+        var responseContains404HTML = response.content.search(/not found/i) > -1;
+        test.equals(404, response.statusCode, "Expected an HTTP 404 return code; actual HTTP response code was " + response.statusCode);
+        test.ok(responseContains404HTML, "Expected the 404 Not Found page to be served.  Instead the content served was: \"" + response.content + "\".");
+        test.done();
+      });
+    },
+
+    "when a 404 page is configured, that is served instead of the default.": function(test) {
+      test.expect(1);
+
+      var filename = httpServer.rootDirectory + "/404.html";
+      var notFoundHTML = "<html><head><title>File Not Found</title></head>" +
+                "<body>The page you requested is not available on this server. Click <a href="/">here</a> to continue.</body>" +
+                "</html>";
+      fs.writeFileSync(filename, notFoundHTML);
+      httpGet("http://localhost:" + port + "/some-non-existant-file", function(response) {
+        var responseContains404HTML = response.content === notFoundHTML;
+        test.ok(responseContains404HTML, "Expected the configured 404 Not Found page to be served.  Instead the content served was: \"" + response.content + "\".");
+        test.done();
+      });
     }
+
   });
 })();
 
