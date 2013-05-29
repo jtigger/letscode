@@ -4,12 +4,23 @@ var http = require("http");
 var url = require("url");
 var fs = require("fs");
 
-var fileRootDirectory = fs.realpathSync(__dirname + "/../../../build/test");
+var DEFAULT_FILE_ROOT_DIRECTORY = fs.realpathSync(__dirname + "/../../../build/test");
+var fileRootDirectory = DEFAULT_FILE_ROOT_DIRECTORY;
+
 
 // port = which TCP/IP port to listen on.
-// callback = invoked when server is ready to accept connections.
-exports.start = function(port, callback) {
+// rootDirectory = filesystem path to the root of what files this server should serve. (optional)
+// callback = invoked when server is ready to accept connections.  (optional)
+exports.start = function(port, rootDirectory, callback) {
   if (!port) { throw new Error("'port' is not optional."); }
+  if (rootDirectory instanceof Function) {
+    callback = rootDirectory;
+    rootDirectory = undefined;
+  }
+
+  if(rootDirectory) {
+    fileRootDirectory = rootDirectory;
+  }
 
   var server = http.createServer();
 
@@ -23,19 +34,39 @@ exports.start = function(port, callback) {
       var filePathname = requestUrl.pathname;
       var fileExtension = ".html";
       var filename = fileRootDirectory + "/" + filePathname + fileExtension;
-      fs.readFile(filename, function(err, data) {
-        if (err) {
-          // TODO: should actually determine what the error is
-          if (err.errno === 34) {
+      fs.exists(filename, function(exists) {
+        if(exists) {
+          fs.readFile(filename, function(err, data) {
+            if(!err) {
+              response.write(data);
+            } else {
+              response.statusCode = 500;
+            }
+            response.end();
+          });
+        } else {
+          var notFoundHTMLFile = "404";
+          fileExtension = ".html";
+          filename = fileRootDirectory + "/" + notFoundHTMLFile + fileExtension;
+          var content = "<html><!-- If you are seeing this, the 404 page is not properly configured. --><body>404 Not Found.</body></html>";
+
+          fs.exists(filename, function(exists) {
             response.statusCode = 404;
-          } else {
-            response.statusCode = 500;
-          }
+            if(exists) {
+              fs.readFile(filename, function(err, data) {
+                if(!err) {
+                  response.write(data);
+                } else {
+                  response.statusCode = 500;
+                }
+                response.end();
+              });
+            } else {
+              response.write(content);
+              response.end();
+            }
+          });
         }
-        if (data) {
-          response.write(data);
-        }
-        response.end();
       });
     }
   });
