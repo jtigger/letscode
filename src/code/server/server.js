@@ -4,9 +4,45 @@ var http = require("http");
 var url = require("url");
 var fs = require("fs");
 
+var DEFAULT_404_HTML = "<html><!-- If you are seeing this, the 404 page is not properly configured. --><body>404 Not Found.</body></html>";
 var DEFAULT_FILE_ROOT_DIRECTORY = fs.realpathSync(__dirname + "/../../../build/test");
 var fileRootDirectory = DEFAULT_FILE_ROOT_DIRECTORY;
 
+function writeFile(response, filename, done) {
+  fs.readFile(filename, function(err, data) {
+    if (!err) {
+      response.write(data);
+    } else {
+      response.statusCode = 500;
+    }
+    done();
+  });
+}
+
+function fileSystemPathForUrl(urlPathname) {
+  var fileExtension = ".html";
+  return fileRootDirectory + "/" + urlPathname + fileExtension;
+}
+
+function serveFileForUrl(response, urlPath) {
+  var filePath = fileSystemPathForUrl(urlPath);
+  fs.exists(filePath, function(exists) {
+    if (exists) {
+      writeFile(response, filePath, function() {
+        response.end();
+      });
+    } else {
+      if(response.statusCode === 404) {
+        response.write(DEFAULT_404_HTML);
+        response.end();
+      } else {
+        response.statusCode = 404;
+        serveFileForUrl(response, "404");
+      }
+    }
+  });
+
+}
 
 // port = which TCP/IP port to listen on.
 // rootDirectory = filesystem path to the root of what files this server should serve. (optional)
@@ -18,7 +54,7 @@ exports.start = function(port, rootDirectory, callback) {
     rootDirectory = undefined;
   }
 
-  if(rootDirectory) {
+  if (rootDirectory) {
     fileRootDirectory = rootDirectory;
   }
 
@@ -31,43 +67,7 @@ exports.start = function(port, rootDirectory, callback) {
     if (requestUrl.pathname === "/") {
       response.end("<html><body><h1>Hello, world!</h1></body></html>");
     } else {
-      var filePathname = requestUrl.pathname;
-      var fileExtension = ".html";
-      var filename = fileRootDirectory + "/" + filePathname + fileExtension;
-      fs.exists(filename, function(exists) {
-        if(exists) {
-          fs.readFile(filename, function(err, data) {
-            if(!err) {
-              response.write(data);
-            } else {
-              response.statusCode = 500;
-            }
-            response.end();
-          });
-        } else {
-          var notFoundHTMLFile = "404";
-          fileExtension = ".html";
-          filename = fileRootDirectory + "/" + notFoundHTMLFile + fileExtension;
-          var content = "<html><!-- If you are seeing this, the 404 page is not properly configured. --><body>404 Not Found.</body></html>";
-
-          fs.exists(filename, function(exists) {
-            response.statusCode = 404;
-            if(exists) {
-              fs.readFile(filename, function(err, data) {
-                if(!err) {
-                  response.write(data);
-                } else {
-                  response.statusCode = 500;
-                }
-                response.end();
-              });
-            } else {
-              response.write(content);
-              response.end();
-            }
-          });
-        }
-      });
+      serveFileForUrl(response, requestUrl.pathname);
     }
   });
   server.listen(port, callback);
