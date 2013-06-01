@@ -61,14 +61,8 @@ exports.start = function(port, rootDirectory, callback) {
   var server = http.createServer();
 
   server.on("request", function(request, response) {
-
     var requestUrl = url.parse(request.url);
-
-    if (requestUrl.pathname === "/") {
-      response.end("<html><body><h1>Hello, world!</h1></body></html>");
-    } else {
-      serveFileForUrl(response, requestUrl.pathname);
-    }
+    serveFileForUrl(response, requestUrl.pathname);
   });
   server.listen(port, callback);
 
