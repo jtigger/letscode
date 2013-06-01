@@ -22,7 +22,6 @@ function httpGet(url, complete) {
   });
 }
 
-
 exports["Given the server is running"] = nodeunit.testCase({
   setUp: function(done) {
     httpServer = server.start(port, done);
@@ -33,14 +32,12 @@ exports["Given the server is running"] = nodeunit.testCase({
   },
 
   "responds to HTTP GET requests.": function(test) {
-    test.expect(1);
-
+    // if the following fails in any way, an exception is thrown
     http.get("http://localhost:" + port, function(response) {
-      test.equals(200, response.statusCode, "Expected server to return the root page; it didn't.");
       response.on("data", function() {});
       test.done();
     });
-  },
+  }
 
 });
 
@@ -133,7 +130,6 @@ exports["Given the server is running, has a web root configured and has some fil
 
   });
 })();
-
 
 exports["In general"] = nodeunit.testCase({
   "when started without a port number, throws an exception": function(test) {
