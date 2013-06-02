@@ -36,7 +36,7 @@ exports["When the server is started"] = nodeunit.testCase({
   },
 
   tearDown: function(done) {
-    server_proc.on("close", function() {
+    server_proc.on("exit", function() {
       done();
     });
 
@@ -44,9 +44,18 @@ exports["When the server is started"] = nodeunit.testCase({
   },
 
   "can serve the Home Page.": function(test) {
+    test.expect(1);
     // if the following fails in any way, an exception is thrown
     httpGet("http://localhost:" + port + "/index", function(response) {
-      test.ok(response.content.indexOf("Home Page") !== -1, "Could not find 'Home Page' marker in response.  Response was = \"" + response.content + "\".");
+      test.ok(response.content.indexOf("pageId=Home") !== -1, "Could not find 'Home Page' marker in response.  Response was = \"" + response.content + "\".");
+      test.done();
+    });
+  },
+
+  "can serve the custom 404 page.": function(test) {
+    test.expect(1);
+    httpGet("http://localhost:" + port + "/some-non-existant", function(response) {
+      test.ok(response.content.indexOf("pageId=404") !== -1, "Could not find '404' marker in response.  Response was = \"" + response.content + "\".");
       test.done();
     });
   }
