@@ -39,7 +39,12 @@ directory(TEST_TEMP_DIR);
 desc("Runs unit tests.");
 task("test", [TEST_TEMP_DIR], function() {
   var reporter = require('nodeunit').reporters.default;
-  reporter.run(['src/specs/server'], null, function(failureOccurred) {
+  var allJavaScriptTests = new jake.FileList();
+  allJavaScriptTests.include("**/*.spec.js");
+  allJavaScriptTests.include("**/*_test.js");
+  allJavaScriptTests.exclude("node_modules");  // assuming these are properly linted, already.
+
+  reporter.run(allJavaScriptTests.toArray(), null, function(failureOccurred) {
     if(failureOccurred) { fail("Task 'test' failed (see above)."); }
     complete();
   });

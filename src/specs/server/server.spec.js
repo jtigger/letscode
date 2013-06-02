@@ -22,23 +22,6 @@ function httpGet(url, complete) {
   });
 }
 
-exports["Given the server is running"] = nodeunit.testCase({
-  setUp: function(done) {
-    httpServer = server.start(port, done);
-  },
-
-  tearDown: function(done) {
-    httpServer.stop(done);
-  },
-
-  "responds to HTTP GET requests.": function(test) {
-    // if the following fails in any way, an exception is thrown
-    httpGet("http://localhost:" + port, function() {
-      test.done();
-    });
-  }
-
-});
 
 exports["Configuring the server"] = nodeunit.testCase({
 
@@ -71,6 +54,24 @@ exports["Configuring the server"] = nodeunit.testCase({
 //
 //    test.done();
 //  }
+});
+
+exports["Given the server is running"] = nodeunit.testCase({
+  setUp: function(done) {
+    httpServer = server.start(port, done);
+  },
+
+  tearDown: function(done) {
+    httpServer.stop(done);
+  },
+
+  "responds to HTTP GET requests.": function(test) {
+    // if the following fails in any way, an exception is thrown
+    httpGet("http://localhost:" + port, function() {
+      test.done();
+    });
+  }
+
 });
 
 exports["Given the server is running, has a web root configured and has some files"] = (function() {
