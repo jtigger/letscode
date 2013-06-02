@@ -9,23 +9,19 @@ Minimum Marketable Feature:
 - collaborative painting wiki
 
 User Stories:
-[ ] "Serve the Home page"
-    As a potential customer of WeeWikiPaint
-    I want a short, sweet, attractive splash page to describe the service
-    so that I can quickly understand what the key features of the tool is and how that can help me.
-    (straight static HTML, no CSS)
-
 [ ] "Ensure 99.9% availability"
     As a visitor to WeeWikiPaint,
     I want to go to the site at a publically accessible location with a sensible URL that is available
     99.9% of the time,
     allowing me to come to trust the the site as "always there."
+    [x] write a smoke test
+    [ ] actually deploy this somewhere.
 
-Engineering Tasks:
-
-
-Current To Dos:
-
+[ ] "Serve the Home page"
+    As a potential customer of WeeWikiPaint
+    I want a short, sweet, attractive splash page to describe the service
+    so that I can quickly understand what the key features of the tool is and how that can help me.
+    (straight static HTML, no CSS)
 
 Future Ideas:
 - abstract away the test framework (?!?!?)
