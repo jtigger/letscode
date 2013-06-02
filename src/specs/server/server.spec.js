@@ -14,7 +14,7 @@ var port = 8000;
 function httpGet(url, complete) {
   http.get(url, function(response) {
     var content = "";
-    response.on("data", function(chunk) { content += chunk; } );
+    response.on("data", function(chunk) { content += chunk; });
     response.on("end", function() {
       response.content = content;
       complete(response);
@@ -22,24 +22,6 @@ function httpGet(url, complete) {
   });
 }
 
-exports["Given the server is running"] = nodeunit.testCase({
-  setUp: function(done) {
-    httpServer = server.start(port, done);
-  },
-
-  tearDown: function(done) {
-    httpServer.stop(done);
-  },
-
-  "responds to HTTP GET requests.": function(test) {
-    // if the following fails in any way, an exception is thrown
-    http.get("http://localhost:" + port, function(response) {
-      response.on("data", function() {});
-      test.done();
-    });
-  }
-
-});
 
 exports["Configuring the server"] = nodeunit.testCase({
 
@@ -47,7 +29,7 @@ exports["Configuring the server"] = nodeunit.testCase({
     httpServer.stop(done);
   },
 
-  "when we specify an existing filesystem directory as the web root, the server serves files from that directory" : function(test) {
+  "when we specify an existing filesystem directory as the web root, the server serves files from that directory": function(test) {
     test.expect(1);
     var webRootDirectory = __dirname + "/../../../build/test/sample-web-root";
     var pathname = "foo";
@@ -74,6 +56,24 @@ exports["Configuring the server"] = nodeunit.testCase({
 //  }
 });
 
+exports["Given the server is running"] = nodeunit.testCase({
+  setUp: function(done) {
+    httpServer = server.start(port, done);
+  },
+
+  tearDown: function(done) {
+    httpServer.stop(done);
+  },
+
+  "responds to HTTP GET requests.": function(test) {
+    // if the following fails in any way, an exception is thrown
+    httpGet("http://localhost:" + port, function() {
+      test.done();
+    });
+  }
+
+});
+
 exports["Given the server is running, has a web root configured and has some files"] = (function() {
   var pathname = "somefile";
   var filename;
@@ -92,7 +92,7 @@ exports["Given the server is running, has a web root configured and has some fil
       httpServer.stop(done);
     },
 
-    "when an existing file is requested, that file is served." : function(test) {
+    "when an existing file is requested, that file is served.": function(test) {
       test.expect(1);
       var url = "http://localhost:" + port + "/" + pathname;
 
@@ -118,8 +118,8 @@ exports["Given the server is running, has a web root configured and has some fil
 
       var filename = httpServer.rootDirectory + "/404.html";
       var notFoundHTML = "<html><head><title>File Not Found</title></head>" +
-                "<body>The page you requested is not available on this server. Click <a href="/">here</a> to continue.</body>" +
-                "</html>";
+        "<body>The page you requested is not available on this server. Click <a href=" / ">here</a> to continue.</body>" +
+        "</html>";
       fs.writeFileSync(filename, notFoundHTML);
       httpGet("http://localhost:" + port + "/some-non-existant-file", function(response) {
         var responseContains404HTML = response.content === notFoundHTML;
@@ -142,7 +142,7 @@ exports["In general"] = nodeunit.testCase({
     test.done();
   },
 
-  "when stopped, the server invokes the configured callback." : function(test) {
+  "when stopped, the server invokes the configured callback.": function(test) {
     test.expect(1);
 
     var callbackCalled = false;
@@ -160,7 +160,7 @@ exports["In general"] = nodeunit.testCase({
     httpServer = server.start(port);
     httpServer.stop();
     test.throws(function() {
-       httpServer.stop();
+      httpServer.stop();
     });
 
     test.done();
