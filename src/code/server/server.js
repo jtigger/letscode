@@ -32,6 +32,7 @@ function serveFileForUrl(response, urlPath) {
         response.end();
       });
     } else {
+      // base-case for recursive call: we're already trying to serve 404 and can't find THAT file.
       if(response.statusCode === 404) {
         response.write(DEFAULT_404_HTML);
         response.end();
