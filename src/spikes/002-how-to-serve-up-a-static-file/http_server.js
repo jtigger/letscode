@@ -32,7 +32,6 @@ server.on("request", function(request, response) {
   fs.readFile(filename, function(err, data) {
     if (err) {
       console.log(err);
-      // TODO: should actually determine what the error is
       if (err.errno === 34) {
         response.statusCode = 404;
         console.log("sent 404.");
