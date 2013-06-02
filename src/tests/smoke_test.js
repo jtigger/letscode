@@ -28,8 +28,13 @@ exports["When first started up"] = nodeunit.testCase({
 
     server_proc = child_process.spawn("node", commandArgs);
 
+    server_proc.stdout.setEncoding("utf8");
+
     server_proc.stdout.on("data", function(chunk) {
       console.log("server_proc (stdout): " + chunk);
+      if(chunk.trim() === "Server started successfully.") {
+        done();
+      }
     });
     server_proc.stderr.on("data", function(chunk) {
       console.log("server_proc (stderr): " + chunk);
@@ -40,11 +45,6 @@ exports["When first started up"] = nodeunit.testCase({
         console.log("(this was in response to process signal [" + signal + "].");
       }
     });
-
-    // TODO: wait until some meaningful signal from the server before calling "done".
-    setTimeout(function() {
-      done();
-    }, 1000);
   },
 
   tearDown: function(done) {
