@@ -31,25 +31,18 @@ exports["When first started up"] = nodeunit.testCase({
     server_proc.stdout.setEncoding("utf8");
 
     server_proc.stdout.on("data", function(chunk) {
-      console.log("server_proc (stdout): " + chunk);
       if(chunk.trim() === "Server started successfully.") {
         done();
-      }
-    });
-    server_proc.stderr.on("data", function(chunk) {
-      console.log("server_proc (stderr): " + chunk);
-    });
-    server_proc.on("close", function(returnCode, signal) {
-      console.log("server_proc exited with return code = " + returnCode);
-      if(signal) {
-        console.log("(this was in response to process signal [" + signal + "].");
       }
     });
   },
 
   tearDown: function(done) {
+    server_proc.on("close", function() {
+      done();
+    });
+
     server_proc.kill();
-    done();
   },
 
   "responds to HTTP GET requests.": function(test) {
