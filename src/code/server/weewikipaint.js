@@ -2,8 +2,14 @@
 "use strict";
 
 var server = require("./server.js");
-var port = 8000;
 
-server.start(port, function() {
+if(process.argv.length < 3) {
+  throw new Error("Invalid number of arguments.");
+}
+
+var rootDirectory = process.argv[2];
+var port = process.argv[3];
+
+server.start(port, rootDirectory, function() {
   console.log("Server started successfully.");
 });

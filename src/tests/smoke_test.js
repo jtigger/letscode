@@ -22,14 +22,12 @@ function httpGet(url, complete) {
   });
 }
 
-exports["When first started up"] = nodeunit.testCase({
+exports["When the server is started"] = nodeunit.testCase({
   setUp: function(done) {
-    var commandArgs = ["./src/code/server/weewikipaint", "./src/code/web", "8000"];
+    var commandArgs = ["./src/code/server/weewikipaint", "./src/code/web", port];
 
     server_proc = child_process.spawn("node", commandArgs);
-
     server_proc.stdout.setEncoding("utf8");
-
     server_proc.stdout.on("data", function(chunk) {
       if(chunk.trim() === "Server started successfully.") {
         done();
@@ -45,9 +43,10 @@ exports["When first started up"] = nodeunit.testCase({
     server_proc.kill();
   },
 
-  "responds to HTTP GET requests.": function(test) {
+  "can serve the Home Page.": function(test) {
     // if the following fails in any way, an exception is thrown
-    httpGet("http://localhost:" + port, function() {
+    httpGet("http://localhost:" + port + "/index", function(response) {
+      test.ok(response.content.indexOf("Home Page") !== -1, "Could not find 'Home Page' marker in response.  Response was = \"" + response.content + "\".");
       test.done();
     });
   }
