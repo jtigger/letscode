@@ -4,7 +4,9 @@
 var nodeunit = require("nodeunit");
 var http = require("http");
 var child_process = require("child_process");
-var port = 8000;
+var fs = require("fs");
+var procfile = require("procfile");
+var port = 5000;
 var server_proc;
 
 // CAP-0001
@@ -14,7 +16,7 @@ var server_proc;
 function httpGet(url, complete) {
   http.get(url, function(response) {
     var content = "";
-    response.on("data", function(chunk) { content += chunk; } );
+    response.on("data", function(chunk) { content += chunk; });
     response.on("end", function() {
       response.content = content;
       complete(response);
@@ -22,14 +24,39 @@ function httpGet(url, complete) {
   });
 }
 
+function replaceVariablesWithValues(string, variables) {
+  for (var variable in variables) {
+    if (variables.hasOwnProperty(variable)) {
+      var envVarRef = "$" + variable;
+      string = string.replace(envVarRef, variables[variable]);
+    }
+  }
+  return string;
+}
+
+function parseProcfile() {
+  var procFileContents;
+  var proc = {};
+  try {
+    // TODO: remove hardcoded path to procfile
+    procFileContents = fs.readFileSync("src/code/server/procfile", {encoding: "utf-8"});
+    procFileContents = replaceVariablesWithValues(procFileContents, process.env);
+    proc = procfile.parse(procFileContents);
+  } catch (error) {
+    console.log(error);
+  }
+
+  return proc;
+}
+
 exports["When the server is started"] = nodeunit.testCase({
   setUp: function(done) {
-    var commandArgs = ["./src/code/server/weewikipaint", "./src/code/web", port];
+    var processDefinition = parseProcfile();
 
-    server_proc = child_process.spawn("node", commandArgs);
+    server_proc = child_process.spawn(processDefinition.web.command, processDefinition.web.options);
     server_proc.stdout.setEncoding("utf8");
     server_proc.stdout.on("data", function(chunk) {
-      if(chunk.trim() === "Server started successfully.") {
+      if (chunk.trim() === "Server started successfully.") {
         done();
       }
     });
@@ -54,7 +81,7 @@ exports["When the server is started"] = nodeunit.testCase({
 
   "can serve the custom 404 page.": function(test) {
     test.expect(1);
-    httpGet("http://localhost:" + port + "/some-non-existant", function(response) {
+    httpGet("http://localhost:" + port + "/some-non-existant-resource", function(response) {
       test.ok(response.content.indexOf("pageId=404") !== -1, "Could not find '404' marker in response.  Response was = \"" + response.content + "\".");
       test.done();
     });
