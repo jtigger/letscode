@@ -5,8 +5,8 @@ var url = require("url");
 var fs = require("fs");
 
 var DEFAULT_404_HTML = "<html><!-- If you are seeing this, the 404 page is not properly configured. --><body>404 Not Found.</body></html>";
-var DEFAULT_FILE_ROOT_DIRECTORY = fs.realpathSync(__dirname + "/../../../build/test");
-var fileRootDirectory = DEFAULT_FILE_ROOT_DIRECTORY;
+//var DEFAULT_FILE_ROOT_DIRECTORY = fs.realpathSync(__dirname + "/../../../build/test");
+var fileRootDirectory /*= DEFAULT_FILE_ROOT_DIRECTORY */;
 
 function writeFile(response, filename, done) {
   fs.readFile(filename, function(err, data) {
