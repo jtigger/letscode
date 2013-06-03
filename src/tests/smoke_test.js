@@ -24,29 +24,31 @@ function httpGet(url, complete) {
   });
 }
 
-function substituteEnvironmentVariables(string) {
-  for (var envVar in process.env) {
-    if (process.env.hasOwnProperty(envVar)) {
-      var envVarRef = "$" + envVar;
-      string = string.replace(envVarRef, process.env[envVar]);
+function replaceVariablesWithValues(string, variables) {
+  for (var variable in variables) {
+    if (variables.hasOwnProperty(variable)) {
+      var envVarRef = "$" + variable;
+      string = string.replace(envVarRef, variables[variable]);
     }
   }
   return string;
 }
 
 function parseProcfile() {
-  var contents;
+  var procFileContents;
   var proc = {};
   try {
-    contents = fs.readFileSync("src/code/server/procfile", {encoding: "utf-8"});
-    contents = substituteEnvironmentVariables(contents);
-    proc = procfile.parse(contents);
+    // TODO: remove hardcoded path to procfile
+    procFileContents = fs.readFileSync("src/code/server/procfile", {encoding: "utf-8"});
+    procFileContents = replaceVariablesWithValues(procFileContents, process.env);
+    proc = procfile.parse(procFileContents);
   } catch (error) {
     console.log(error);
   }
 
   return proc;
 }
+
 exports["When the server is started"] = nodeunit.testCase({
   setUp: function(done) {
     var processDefinition = parseProcfile();
@@ -79,7 +81,7 @@ exports["When the server is started"] = nodeunit.testCase({
 
   "can serve the custom 404 page.": function(test) {
     test.expect(1);
-    httpGet("http://localhost:" + port + "/some-non-existant", function(response) {
+    httpGet("http://localhost:" + port + "/some-non-existant-resource", function(response) {
       test.ok(response.content.indexOf("pageId=404") !== -1, "Could not find '404' marker in response.  Response was = \"" + response.content + "\".");
       test.done();
     });
