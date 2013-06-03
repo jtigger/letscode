@@ -6,7 +6,7 @@ var http = require("http");
 var child_process = require("child_process");
 var fs = require("fs");
 var procfile = require("procfile");
-var port = 8000;
+var port = 5000;
 var server_proc;
 
 // CAP-0001
@@ -24,11 +24,22 @@ function httpGet(url, complete) {
   });
 }
 
+function substituteEnvironmentVariables(string) {
+  for (var envVar in process.env) {
+    if (process.env.hasOwnProperty(envVar)) {
+      var envVarRef = "$" + envVar;
+      string = string.replace(envVarRef, process.env[envVar]);
+    }
+  }
+  return string;
+}
+
 function parseProcfile() {
   var contents;
   var proc = {};
   try {
     contents = fs.readFileSync("src/code/server/procfile", {encoding: "utf-8"});
+    contents = substituteEnvironmentVariables(contents);
     proc = procfile.parse(contents);
   } catch (error) {
     console.log(error);
@@ -38,9 +49,9 @@ function parseProcfile() {
 }
 exports["When the server is started"] = nodeunit.testCase({
   setUp: function(done) {
-    var proc = parseProcfile();
+    var processDefinition = parseProcfile();
 
-    server_proc = child_process.spawn(proc.web.command, proc.web.options);
+    server_proc = child_process.spawn(processDefinition.web.command, processDefinition.web.options);
     server_proc.stdout.setEncoding("utf8");
     server_proc.stdout.on("data", function(chunk) {
       if (chunk.trim() === "Server started successfully.") {
