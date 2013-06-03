@@ -39,7 +39,7 @@ function parseProcfile() {
   var proc = {};
   try {
     // TODO: remove hardcoded path to procfile
-    procFileContents = fs.readFileSync("src/code/server/procfile", {encoding: "utf-8"});
+    procFileContents = fs.readFileSync("Procfile", {encoding: "utf-8"});
     procFileContents = replaceVariablesWithValues(procFileContents, process.env);
     proc = procfile.parse(procFileContents);
   } catch (error) {
