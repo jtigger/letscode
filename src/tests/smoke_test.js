@@ -4,6 +4,8 @@
 var nodeunit = require("nodeunit");
 var http = require("http");
 var child_process = require("child_process");
+var fs = require("fs");
+var procfile = require("procfile");
 var port = 8000;
 var server_proc;
 
@@ -14,7 +16,7 @@ var server_proc;
 function httpGet(url, complete) {
   http.get(url, function(response) {
     var content = "";
-    response.on("data", function(chunk) { content += chunk; } );
+    response.on("data", function(chunk) { content += chunk; });
     response.on("end", function() {
       response.content = content;
       complete(response);
@@ -22,14 +24,26 @@ function httpGet(url, complete) {
   });
 }
 
+function parseProcfile() {
+  var contents;
+  var proc = {};
+  try {
+    contents = fs.readFileSync("src/code/server/procfile", {encoding: "utf-8"});
+    proc = procfile.parse(contents);
+  } catch (error) {
+    console.log(error);
+  }
+
+  return proc;
+}
 exports["When the server is started"] = nodeunit.testCase({
   setUp: function(done) {
-    var commandArgs = ["./src/code/server/weewikipaint", "./src/code/web", port];
+    var proc = parseProcfile();
 
-    server_proc = child_process.spawn("node", commandArgs);
+    server_proc = child_process.spawn(proc.web.command, proc.web.options);
     server_proc.stdout.setEncoding("utf8");
     server_proc.stdout.on("data", function(chunk) {
-      if(chunk.trim() === "Server started successfully.") {
+      if (chunk.trim() === "Server started successfully.") {
         done();
       }
     });
