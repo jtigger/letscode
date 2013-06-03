@@ -53,7 +53,11 @@ exports["When the server is started"] = nodeunit.testCase({
   setUp: function(done) {
     var processDefinition = parseProcfile();
 
-    server_proc = child_process.spawn(processDefinition.web.command, processDefinition.web.options);
+    try {
+      server_proc = child_process.spawn(processDefinition.web.command, processDefinition.web.options);
+    } catch (error) {
+      console.log(error);
+    }
     server_proc.stdout.setEncoding("utf8");
     server_proc.stdout.on("data", function(chunk) {
       if (chunk.trim() === "Server started successfully.") {
