@@ -68,6 +68,7 @@ task("clean", function() {
 });
 
 task("check node version", function() {
+  // TODO: obtain node version from the package.json definition.
   var expectedNodeVersion = "v0.10.8";
   var actualNodeVersion = process.version;
 
