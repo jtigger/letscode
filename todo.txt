@@ -1,7 +1,7 @@
 WeeWikiPaint
 
 Minimum Marketable Feature:
-* marketing home page
+- single-user painting on home page
 - collaborative painting page (very basic)
 - wikify pages
 - more complex painting
@@ -9,19 +9,15 @@ Minimum Marketable Feature:
 - collaborative painting wiki
 
 User Stories:
-[ ] "Ensure 99.9% availability"
-    As a visitor to WeeWikiPaint,
-    I want to go to the site at a publically accessible location with a sensible URL that is available
-    99.9% of the time,
-    allowing me to come to trust the the site as "always there."
-    [x] write a smoke test
-    [ ] actually deploy this somewhere.
+[ ] "Canvas"
+    As a WeeWikiPaint author
+    I want to see a drawing canvas
+    so that I know where I can paint.
+    [ ] setup client-side testing
+    [ ]
 
-[ ] "Serve the Home page"
-    As a potential customer of WeeWikiPaint
-    I want a short, sweet, attractive splash page to describe the service
-    so that I can quickly understand what the key features of the tool is and how that can help me.
-    (straight static HTML, no CSS)
+[ ] "Draw a Line"
+
 
 Future Ideas:
 - abstract away the test framework (?!?!?)
@@ -29,6 +25,18 @@ Future Ideas:
 
 
 DONE:
+[x] "Ensure 99.9% availability"
+    As a visitor to WeeWikiPaint,
+    I want to go to the site at a publically accessible location with a sensible URL that is available
+    99.9% of the time,
+    allowing me to come to trust the the site as "always there."
+    [x] write a smoke test
+    [x] actually deploy this somewhere.
+[x] "Serve the Home page"
+    As a potential customer of WeeWikiPaint
+    I want a short, sweet, attractive splash page to describe the service
+    so that I can quickly understand what the key features of the tool is and how that can help me.
+    (straight static HTML, no CSS)
 [x] "Serve 404s for all other pages"
     I want to see a clearly stated 404 page whenever I ask for a file/resource that does not exist,
     As a visitor to WeeWikiPaint,
