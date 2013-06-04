@@ -8,12 +8,13 @@ var server = require("../../code/server/server.js");
 var httpServer;
 var port = 8000;
 
-// CAP-0001
+
 // complete -- function to invoke when the HTTP GET completes.  This function is passed an instance
 //             of node's http.ServerResponse (http://nodejs.org/api/http.html#http_class_http_serverresponse)
 //             with an additional property named "content" which holds the textual content of the response.
 function httpGet(url, complete) {
-  http.get(url, function(response) {
+   // CAP-0001
+   http.get(url, function(response) {
     var content = "";
     response.on("data", function(chunk) { content += chunk; });
     response.on("end", function() {

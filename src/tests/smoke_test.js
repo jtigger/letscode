@@ -9,11 +9,11 @@ var procfile = require("procfile");
 var port = 5000;
 var server_proc;
 
-// CAP-0001
 // complete -- function to invoke when the HTTP GET completes.  This function is passed an instance
 //             of node's http.ServerResponse (http://nodejs.org/api/http.html#http_class_http_serverresponse)
 //             with an additional property named "content" which holds the textual content of the response.
 function httpGet(url, complete) {
+  // CAP-0001
   http.get(url, function(response) {
     var content = "";
     response.on("data", function(chunk) { content += chunk; });
@@ -39,7 +39,7 @@ function parseProcfile() {
   var proc = {};
   try {
     // TODO: remove hardcoded path to procfile
-    procFileContents = fs.readFileSync("src/code/server/procfile", {encoding: "utf-8"});
+    procFileContents = fs.readFileSync("Procfile", {encoding: "utf-8"});
     procFileContents = replaceVariablesWithValues(procFileContents, process.env);
     proc = procfile.parse(procFileContents);
   } catch (error) {
@@ -53,7 +53,11 @@ exports["When the server is started"] = nodeunit.testCase({
   setUp: function(done) {
     var processDefinition = parseProcfile();
 
-    server_proc = child_process.spawn(processDefinition.web.command, processDefinition.web.options);
+    try {
+      server_proc = child_process.spawn(processDefinition.web.command, processDefinition.web.options);
+    } catch (error) {
+      console.log(error);
+    }
     server_proc.stdout.setEncoding("utf8");
     server_proc.stdout.on("data", function(chunk) {
       if (chunk.trim() === "Server started successfully.") {

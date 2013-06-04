@@ -38,14 +38,29 @@ directory(TEST_TEMP_DIR);
 
 desc("Runs unit tests.");
 task("test", [TEST_TEMP_DIR], function() {
+  // CAP-0002
   var reporter = require('nodeunit').reporters.default;
   var allJavaScriptTests = new jake.FileList();
   allJavaScriptTests.include("**/*.spec.js");
   allJavaScriptTests.include("**/*_test.js");
+  allJavaScriptTests.exclude("production_smoke_test.js");
   allJavaScriptTests.exclude("node_modules");  // assuming these are properly linted, already.
 
   reporter.run(allJavaScriptTests.toArray(), null, function(failureOccurred) {
     if(failureOccurred) { fail("Task 'test' failed (see above)."); }
+    complete();
+  });
+}, {async: true});
+
+desc("Runs production verification tests.");
+task("test.prod", [TEST_TEMP_DIR], function() {
+  // CAP-0002
+  var reporter = require('nodeunit').reporters.default;
+  var productionTests = new jake.FileList();
+  productionTests.include("src/tests/production_smoke_test.js");
+
+  reporter.run(productionTests.toArray(), null, function(failureOccurred) {
+    if(failureOccurred) { fail("Task 'test.prod' failed (see above)."); }
     complete();
   });
 }, {async: true});
@@ -68,6 +83,7 @@ task("clean", function() {
 });
 
 task("check node version", function() {
+  // TODO: obtain node version from the package.json definition.
   var expectedNodeVersion = "v0.10.8";
   var actualNodeVersion = process.version;
 
