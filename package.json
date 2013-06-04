@@ -13,6 +13,7 @@
     "jake": "*",
     "jshint": "*",
     "nodeunit": "*",
-    "procfile" : "*"
+    "procfile" : "*",
+    "karma" : "*"
   }
 }
