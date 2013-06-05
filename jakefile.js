@@ -94,7 +94,6 @@ desc("Runs JSLint on everything");
 task("lint", ["lint.server", "lint.client"]);
 
 task("lint.server", function() {
-  // CAP-0002
   console.log("\nLinting server-side code...");
 
   var serverSideJavaScriptFiles = new jake.FileList();
@@ -110,7 +109,6 @@ task("lint.server", function() {
 
 
 task("lint.client", function() {
-  // CAP-0002
   console.log("\nLinting client-side code...");
 
   var clientSideJavaScriptFiles = new jake.FileList();
