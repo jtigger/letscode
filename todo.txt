@@ -14,7 +14,8 @@ User Stories:
     I want to see a drawing canvas
     so that I know where I can paint.
     [ ] setup client-side testing
-    [ ]
+    [ ] move karma.conf.js into the right spot.
+
 
 [ ] "Draw a Line"
 
