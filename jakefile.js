@@ -36,14 +36,13 @@ task("integrate", ["default"], function() {
 directory(BUILD_DIR);
 directory(TEST_TEMP_DIR);
 
-desc("Runs unit tests.");
-task("test", [TEST_TEMP_DIR], function() {
+desc("Runs server-side unit tests.");
+task("test.unit.server", [TEST_TEMP_DIR], function() {
   // CAP-0002
   var reporter = require('nodeunit').reporters.default;
   var allJavaScriptTests = new jake.FileList();
-  allJavaScriptTests.include("**/*.spec.js");
-  allJavaScriptTests.include("**/*_test.js");
-  allJavaScriptTests.exclude("production_smoke_test.js");
+  allJavaScriptTests.include("src/specs/server/*.js");
+  allJavaScriptTests.include("src/tests/smoke_test.js");
   allJavaScriptTests.exclude("node_modules");  // assuming these are properly linted, already.
 
   reporter.run(allJavaScriptTests.toArray(), null, function(failureOccurred) {
@@ -51,6 +50,11 @@ task("test", [TEST_TEMP_DIR], function() {
     complete();
   });
 }, {async: true});
+
+desc("Runs client-side unit tests.");
+task("test.unit.client", [], function() {
+  console.log("test.unit.client");
+});
 
 desc("Runs production verification tests.");
 task("test.prod", [TEST_TEMP_DIR], function() {
@@ -65,12 +69,18 @@ task("test.prod", [TEST_TEMP_DIR], function() {
   });
 }, {async: true});
 
+desc("Runs all unit tests");
+task("test.unit", ["test.unit.server", "test.unit.client"],function() {
+
+});
+
 desc("Runs JSLint (to catch common JavaScript errors).");
 task("lint", function() {
   var lint_runner = require("./src/build/lint/lint_runner.js");
 
   var allJavaScriptSources = new jake.FileList();
   allJavaScriptSources.include("**/*.js");
+  allJavaScriptSources.exclude("karma.conf.js");  // won't be proper stand-alone js, it's JSON config file.
   allJavaScriptSources.exclude("node_modules");  // assuming these are properly linted, already.
   var passesLint = lint_runner.validateFileList(allJavaScriptSources, getJSHintOptions());
 
@@ -94,5 +104,5 @@ task("check node version", function() {
 });
 
 desc("Full build.");
-task("default", ["check node version", "clean", "lint", "test"]);
+task("default", ["check node version", "clean", "lint", "test.unit"]);
 
