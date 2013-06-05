@@ -3,8 +3,9 @@
 
 var BUILD_DIR = "build";
 var TEST_TEMP_DIR = BUILD_DIR + "/test";
+var lint_runner = require("./src/build/lint/lint_runner.js");
 
-function getJSHintOptions() {
+function getCommonJSHintOptions() {
   return {
     bitwise: false,
     curly: true,
@@ -20,9 +21,20 @@ function getJSHintOptions() {
     strict: true,
     trailing: true,
     maxstatements: 15,
-    maxcomplexity: 10,
-    node: true
+    maxcomplexity: 10
   };
+}
+
+function getJSHintOptionsForServerSideCode() {
+  var options = getCommonJSHintOptions();
+  options.node = true;
+  return options;
+}
+
+function getJSHintOptionsForBrowsers() {
+  var options = getCommonJSHintOptions();
+  options.browser = true;
+  return  options;
 }
 
 desc("Integration");
@@ -58,12 +70,12 @@ task("test.unit.client", [], function() {
     if(errorCode) {
       fail("Task 'test.unit.client' failed with error code = " + errorCode + " (see above).");
     }
+    complete();
   });
 }, {async: true});
 
 desc("Runs all unit tests");
-task("test.unit", ["test.unit.server", "test.unit.client"], function() {
-});
+task("test.unit", ["test.unit.server", "test.unit.client"]);
 
 desc("Runs production verification tests.");
 task("test.prod", [TEST_TEMP_DIR], function() {
@@ -78,17 +90,35 @@ task("test.prod", [TEST_TEMP_DIR], function() {
   });
 }, {async: true});
 
-desc("Runs JSLint (to catch common JavaScript errors).");
-task("lint", function() {
-  var lint_runner = require("./src/build/lint/lint_runner.js");
+desc("Runs JSLint on everything");
+task("lint", ["lint.server", "lint.client"]);
 
-  var allJavaScriptSources = new jake.FileList();
-  allJavaScriptSources.include("**/*.js");
-  allJavaScriptSources.exclude("karma.conf.js");  // won't be proper stand-alone js, it's JSON config file.
-  allJavaScriptSources.exclude("node_modules");  // assuming these are properly linted, already.
-  var passesLint = lint_runner.validateFileList(allJavaScriptSources, getJSHintOptions());
+task("lint.server", function() {
+  // CAP-0002
+  console.log("\nLinting server-side code...");
 
-  if(!passesLint) { fail("Task 'lint' failed (see above)."); }
+  var serverSideJavaScriptFiles = new jake.FileList();
+  serverSideJavaScriptFiles.include("src/**/server/**/*.js");
+  serverSideJavaScriptFiles.include("src/tests/smoke_test.js");
+  serverSideJavaScriptFiles.include("src/build/**/*.js");
+  serverSideJavaScriptFiles.include("*.js");
+  serverSideJavaScriptFiles.exclude("karma.conf.js");  // won't be proper stand-alone js, it's JSON config file.
+  var passesLint = lint_runner.validateFileList(serverSideJavaScriptFiles, getJSHintOptionsForServerSideCode());
+
+  if(!passesLint) { fail("Task 'lint.server' failed (see above)."); }
+});
+
+
+task("lint.client", function() {
+  // CAP-0002
+  console.log("\nLinting client-side code...");
+
+  var clientSideJavaScriptFiles = new jake.FileList();
+  clientSideJavaScriptFiles.include("src/**/client/**/*.js");
+  clientSideJavaScriptFiles.include("src/code/web/**/*.js");
+  var passesLint = lint_runner.validateFileList(clientSideJavaScriptFiles, getJSHintOptionsForBrowsers());
+
+  if(!passesLint) { fail("Task 'lint.client' failed (see above)."); }
 });
 
 desc("Purges the build output directory (i.e. " + BUILD_DIR + ").");
