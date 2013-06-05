@@ -46,14 +46,23 @@ task("test.unit.server", [TEST_TEMP_DIR], function() {
   allJavaScriptTests.exclude("node_modules");  // assuming these are properly linted, already.
 
   reporter.run(allJavaScriptTests.toArray(), null, function(failureOccurred) {
-    if(failureOccurred) { fail("Task 'test' failed (see above)."); }
+    if(failureOccurred) { fail("Task 'test.unit.server' failed (see above)."); }
     complete();
   });
 }, {async: true});
 
 desc("Runs client-side unit tests.");
 task("test.unit.client", [], function() {
-  console.log("test.unit.client");
+  var config = {};
+  require("karma/lib/runner").run(config, function(errorCode) {
+    if(errorCode) {
+      fail("Task 'test.unit.client' failed with error code = " + errorCode + " (see above).");
+    }
+  });
+}, {async: true});
+
+desc("Runs all unit tests");
+task("test.unit", ["test.unit.server", "test.unit.client"], function() {
 });
 
 desc("Runs production verification tests.");
@@ -68,11 +77,6 @@ task("test.prod", [TEST_TEMP_DIR], function() {
     complete();
   });
 }, {async: true});
-
-desc("Runs all unit tests");
-task("test.unit", ["test.unit.server", "test.unit.client"],function() {
-
-});
 
 desc("Runs JSLint (to catch common JavaScript errors).");
 task("lint", function() {
