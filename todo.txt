@@ -22,7 +22,7 @@ User Stories:
 
 
 Future Ideas:
-
+[ ] set time limits for tests.
 
 DONE:
 [x] "Ensure 99.9% availability"

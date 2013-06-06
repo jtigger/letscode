@@ -4,6 +4,14 @@
 var BUILD_DIR = "build";
 var TEST_TEMP_DIR = BUILD_DIR + "/test";
 var lint_runner = require("./src/build/lint/lint_runner.js");
+var $p = require("procstreams");
+var supportedBrowsers = [
+  "IE 7.0 (Windows)",
+  "IE 8.0 (Windows)",
+  "Chrome 27.0 (Windows)",
+  "Chrome 27.0 (Mac)",
+  "Safari 6.0 (Mac)"
+];
 
 function getCommonJSHintOptions() {
   return {
@@ -37,6 +45,9 @@ function getJSHintOptionsForBrowsers() {
   return  options;
 }
 
+directory(BUILD_DIR);
+directory(TEST_TEMP_DIR);
+
 desc("Integration");
 task("integrate", ["default"], function() {
   console.log("Steps for the commit tango...");
@@ -44,9 +55,6 @@ task("integrate", ["default"], function() {
   console.log("2. Pull to the Integation Station and verify the build there.\n   integration$ git pull && ./jake.sh\n");
   console.log("3. If all good, merge changes into 'last-known-good'\n   yourbox$ merge-to-integration.sh\n");
 });
-
-directory(BUILD_DIR);
-directory(TEST_TEMP_DIR);
 
 desc("Runs server-side unit tests.");
 task("test.unit.server", [TEST_TEMP_DIR], function() {
@@ -58,18 +66,24 @@ task("test.unit.server", [TEST_TEMP_DIR], function() {
   allJavaScriptTests.exclude("node_modules");  // assuming these are properly linted, already.
 
   reporter.run(allJavaScriptTests.toArray(), null, function(failureOccurred) {
-    if(failureOccurred) { fail("Task 'test.unit.server' failed (see above)."); }
+    if (failureOccurred) { fail("Task 'test.unit.server' failed (see above)."); }
     complete();
   });
 }, {async: true});
 
 desc("Runs client-side unit tests.");
 task("test.unit.client", [], function() {
-  var config = {};
-  require("karma/lib/runner").run(config, function(errorCode) {
-    if(errorCode) {
-      fail("Task 'test.unit.client' failed with error code = " + errorCode + " (see above).");
+  var testRunnerCommand = "node node_modules/.bin/karma run";
+  $p(testRunnerCommand, {out: true}).data(function(err, stdout) {
+    var testOutput = stdout.toString();
+    if (err) {
+      fail("Client-side tests failed (see above).");
     }
+    supportedBrowsers.forEach(function(supportedBrowser) {
+      if (testOutput.indexOf(supportedBrowser) === -1) {
+        fail("Client-side tests were not run against " + supportedBrowser + " as is required.");
+      }
+    });
     complete();
   });
 }, {async: true});
@@ -85,7 +99,7 @@ task("test.prod", [TEST_TEMP_DIR], function() {
   productionTests.include("src/tests/production_smoke_test.js");
 
   reporter.run(productionTests.toArray(), null, function(failureOccurred) {
-    if(failureOccurred) { fail("Task 'test.prod' failed (see above)."); }
+    if (failureOccurred) { fail("Task 'test.prod' failed (see above)."); }
     complete();
   });
 }, {async: true});
@@ -104,9 +118,8 @@ task("lint.server", function() {
   serverSideJavaScriptFiles.exclude("karma.conf.js");  // won't be proper stand-alone js, it's JSON config file.
   var passesLint = lint_runner.validateFileList(serverSideJavaScriptFiles, getJSHintOptionsForServerSideCode());
 
-  if(!passesLint) { fail("Task 'lint.server' failed (see above)."); }
+  if (!passesLint) { fail("Task 'lint.server' failed (see above)."); }
 });
-
 
 task("lint.client", function() {
   console.log("\nLinting client-side code...");
@@ -116,7 +129,7 @@ task("lint.client", function() {
   clientSideJavaScriptFiles.include("src/code/web/**/*.js");
   var passesLint = lint_runner.validateFileList(clientSideJavaScriptFiles, getJSHintOptionsForBrowsers());
 
-  if(!passesLint) { fail("Task 'lint.client' failed (see above)."); }
+  if (!passesLint) { fail("Task 'lint.client' failed (see above)."); }
 });
 
 desc("Purges the build output directory (i.e. " + BUILD_DIR + ").");
@@ -130,7 +143,7 @@ task("check node version", function() {
   var actualNodeVersion = process.version;
 
   // since node.js is changes quite frequently, making this an exact match, for now.
-  if(actualNodeVersion !== expectedNodeVersion) {
+  if (actualNodeVersion !== expectedNodeVersion) {
     fail(actualNodeVersion + " is an unsupported version of node.js.  Must be " + expectedNodeVersion);
   }
 });

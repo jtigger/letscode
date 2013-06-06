@@ -2,15 +2,15 @@
 // Generated on Tue Jun 04 2013 07:26:23 GMT-0700 (PDT)
 
 // base path, that will be used to resolve files and exclude
-basePath = '.';
+basePath = 'build/test';
 
 
 // list of files / patterns to load in the browser
 files = [
   MOCHA,
   MOCHA_ADAPTER,
-  "node_modules/expect.js/expect.js",
-  "src/specs/client/*.js"
+  "../../node_modules/expect.js/expect.js",
+  "../../src/specs/client/*.js"
 ];
 
 
@@ -22,7 +22,7 @@ exclude = [
 
 // test results reporter to use
 // possible values: 'dots', 'progress', 'junit'
-reporters = ['progress'];
+reporters = ['progress', 'junit'];
 
 
 // web server port
