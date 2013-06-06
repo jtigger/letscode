@@ -1,8 +1,8 @@
 // Karma configuration
 // Generated on Tue Jun 04 2013 07:26:23 GMT-0700 (PDT)
 
-// base path, that will be used to resolve files and exclude
-basePath = 'build/test';
+// base path, that will be used to resolve files and exclude and location of test output
+basePath = '../../build/test';
 
 
 // list of files / patterns to load in the browser
