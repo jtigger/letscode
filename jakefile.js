@@ -45,6 +45,8 @@ function getJSHintOptionsForBrowsers() {
   return  options;
 }
 
+var karmaCommand = "node node_modules/.bin/karma ";
+
 directory(BUILD_DIR);
 directory(TEST_TEMP_DIR);
 
@@ -55,6 +57,13 @@ task("integrate", ["default"], function() {
   console.log("2. Pull to the Integation Station and verify the build there.\n   integration$ git pull && ./jake.sh\n");
   console.log("3. If all good, merge changes into 'last-known-good'\n   yourbox$ merge-to-integration.sh\n");
 });
+
+desc("Starts the Karma server (which captures browsers for client-side testing).");
+task("karma", [], function() {
+  var startKaramServer = karmaCommand + "start src/build/karma.conf.js";
+  $p(startKaramServer, {out: true}, complete);
+}, {async: true});
+
 
 desc("Runs server-side unit tests.");
 task("test.unit.server", [TEST_TEMP_DIR], function() {
@@ -73,7 +82,7 @@ task("test.unit.server", [TEST_TEMP_DIR], function() {
 
 desc("Runs client-side unit tests.");
 task("test.unit.client", [], function() {
-  var testRunnerCommand = "node node_modules/.bin/karma run";
+  var testRunnerCommand = karmaCommand + "run";
   $p(testRunnerCommand, {out: true}).data(function(err, stdout) {
     var testOutput = stdout.toString();
     if (err) {
