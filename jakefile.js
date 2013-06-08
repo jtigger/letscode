@@ -47,6 +47,17 @@ function getJSHintOptionsForBrowsers() {
 
 var karmaCommand = "node node_modules/.bin/karma ";
 
+function karma(command, done) {
+  var testRunnerCommand = karmaCommand + command;
+  $p(testRunnerCommand, {out: true}).data(function(err, stdout) {
+    if (err) {
+      done(err);
+    } else {
+      done(stdout.toString());
+    }
+  });
+}
+
 directory(BUILD_DIR);
 directory(TEST_TEMP_DIR);
 
@@ -60,8 +71,12 @@ task("integrate", ["default"], function() {
 
 desc("Starts the Karma server (which captures browsers for client-side testing).");
 task("karma", [], function() {
-  var startKaramServer = karmaCommand + "start src/build/karma.conf.js";
-  $p(startKaramServer, {out: true}, complete);
+  karma("start src/build/karma.conf.js", function(results) {
+    if(results instanceof Error) {
+      fail("Failed to start Karma server with \"" + results.toString() + "\" (also, see above).");
+    }
+    complete();
+  });
 }, {async: true});
 
 
@@ -80,16 +95,15 @@ task("test.unit.server", [TEST_TEMP_DIR], function() {
   });
 }, {async: true});
 
+
 desc("Runs client-side unit tests.");
 task("test.unit.client", [], function() {
-  var testRunnerCommand = karmaCommand + "run";
-  $p(testRunnerCommand, {out: true}).data(function(err, stdout) {
-    var testOutput = stdout.toString();
-    if (err) {
-      fail("Client-side tests failed (see above).");
+  karma("run", function(results) {
+    if(results instanceof Error) {
+      fail("Client-side tests failed with \"" + results.toString() + "\" (also, see above).");
     }
     supportedBrowsers.forEach(function(supportedBrowser) {
-      if (testOutput.indexOf(supportedBrowser) === -1) {
+      if (results.indexOf(supportedBrowser) === -1) {
         fail("Client-side tests were not run against " + supportedBrowser + " as is required.");
       }
     });
