@@ -220,5 +220,7 @@ task("check.dependencies", function() {
 });
 
 desc("Full build.");
-task("default", ["check.dependencies", "clean", "lint", "test.unit"]);
+task("default", ["check.dependencies", "clean", "lint", "test.unit"], function() {
+  jake.logger.log("\nBuild Completed Successfully!");
+});
 

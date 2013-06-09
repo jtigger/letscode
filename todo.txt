@@ -15,10 +15,14 @@ User Stories:
     so that I know where I can paint.
     [x] setup client-side testing
     [x] Split out linting into client-side and server-side
-    [ ] move karma.conf.js into the right spot.
+    [x] move karma.conf.js into the right spot.
+    [ ]
 
 
-[ ] "Draw a Line"
+[ ] "Draw a Line" (pre-defined)
+[ ] "Draw a Line" (via mouse)
+[ ] "Draw a Line" (via touch)
+[ ] "Draw multiple lines"
 
 
 Future Ideas:
