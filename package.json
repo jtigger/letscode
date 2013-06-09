@@ -10,12 +10,13 @@
     "npm": "1.2.x"
   },
   "dependencies": {
-    "expect.js": "*",
     "jake": "*",
     "jshint": "*",
+    "procfile" : "*",
+    "procstreams": "*",
+    "expect.js": "*",
     "karma" : "*",
     "mocha" : "*",
-    "nodeunit": "*",
-    "procfile" : "*"
+    "nodeunit": "*"
   }
 }

@@ -13,7 +13,8 @@ User Stories:
     As a WeeWikiPaint author
     I want to see a drawing canvas
     so that I know where I can paint.
-    [ ] setup client-side testing
+    [x] setup client-side testing
+    [x] Split out linting into client-side and server-side
     [ ] move karma.conf.js into the right spot.
 
 
@@ -21,9 +22,7 @@ User Stories:
 
 
 Future Ideas:
-- abstract away the test framework (?!?!?)
-  - swap out for a different test framework to make sure the abstraction layer works.
-
+[ ] set time limits for tests.
 
 DONE:
 [x] "Ensure 99.9% availability"
