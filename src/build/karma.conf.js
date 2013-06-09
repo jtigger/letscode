@@ -10,7 +10,9 @@ files = [
   MOCHA,
   MOCHA_ADAPTER,
   "../../node_modules/expect.js/expect.js",
-  "../../src/specs/client/*.js"
+  "../../src/specs/client/*.js",
+  "../../src/code/web/scripts/*.js",
+  "../../lib/*.js"
 ];
 
 

@@ -7,7 +7,7 @@ var lint_runner = require("./src/build/lint/lint_runner.js");
 var path = require("path");
 
 var supportedBrowsers = [
-  "IE 7.0 (Windows)",
+//  "IE 7.0 (Windows)",
   "IE 8.0 (Windows)",
   "Chrome 27.0 (Windows)",
   "Chrome 27.0 (Mac)",

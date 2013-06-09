@@ -26,6 +26,9 @@ User Stories:
 
 
 Future Ideas:
+[ ] add an assembly step in the build to merge all code into a single package-able/deployable web app.
+    (mostly, this is about being able to keep source files in whatever organization I want, but then be able
+     to move stuff around for an actual deployment, like jquery).
 [ ] set time limits for tests.
 
 DONE:
