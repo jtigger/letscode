@@ -9,16 +9,6 @@ Minimum Marketable Feature:
 - collaborative painting wiki
 
 User Stories:
-[ ] "Canvas"
-    As a WeeWikiPaint author
-    I want to see a drawing canvas
-    so that I know where I can paint.
-    [x] setup client-side testing
-    [x] Split out linting into client-side and server-side
-    [x] move karma.conf.js into the right spot.
-    [ ]
-
-
 [ ] "Draw a Line" (pre-defined)
 [ ] "Draw a Line" (via mouse)
 [ ] "Draw a Line" (via touch)
@@ -26,12 +16,21 @@ User Stories:
 
 
 Future Ideas:
+[ ]
 [ ] add an assembly step in the build to merge all code into a single package-able/deployable web app.
     (mostly, this is about being able to keep source files in whatever organization I want, but then be able
      to move stuff around for an actual deployment, like jquery).
 [ ] set time limits for tests.
 
 DONE:
+[x] "Canvas"
+    As a WeeWikiPaint author
+    I want to see a drawing canvas
+    so that I know where I can paint.
+    [x] setup client-side testing
+    [x] Split out linting into client-side and server-side
+    [x] move karma.conf.js into the right spot.
+
 [x] "Ensure 99.9% availability"
     As a visitor to WeeWikiPaint,
     I want to go to the site at a publically accessible location with a sensible URL that is available
