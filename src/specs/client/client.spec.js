@@ -1,5 +1,5 @@
 // Copyright (c) 2013 by John S. Ryan.  All rights reserved.  See LICENSE.txt for details.
-/* globals afterEach, beforeEach, describe, expect, it, wwp, $ */
+/* globals afterEach, beforeEach, describe, expect, it, Raphael, wwp, $ */
 
 (function() {
   "use strict";
@@ -20,12 +20,13 @@
       var drawingAreaChildTag;
 
       wwp.initializeDrawingArea(drawingArea[0]);
-
       drawingAreaChildTag = drawingArea.children()[0].tagName.toLowerCase();
-      // if a browser does not support SVG (e.g. IE 8), the canvas will be a DIV tag.
-      // otherwise, it will be a SVG tag.
-      if(drawingAreaChildTag !== "svg" && drawingAreaChildTag !== "div") {
-        expect().fail("could not find the HTML element that contains the canvas.  Should be either 'svg' or 'div' (IE 8).");
+
+      // modern browsers support SVG, older (e.g. IE 8) do not.
+      if(Raphael.type === "SVG") {
+        expect(drawingAreaChildTag).to.be("svg");
+      } else {
+        expect(drawingAreaChildTag).to.be("div");
       }
     });
 
