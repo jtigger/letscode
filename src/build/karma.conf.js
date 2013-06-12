@@ -9,11 +9,13 @@ basePath = '../../build/test';
 files = [
   MOCHA,
   MOCHA_ADAPTER,
+  "../../lib/jquery-1.10.1.js",
+  "../../lib/raphael-min-2.1.0.js",
   "../../node_modules/expect.js/expect.js",
-  "../../src/specs/client/*.js",
   "../../src/code/web/scripts/*.js",
-  "../../lib/*.js"
+  "../../src/specs/client/*.js"
 ];
+
 
 
 // list of files to exclude
