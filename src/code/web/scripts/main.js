@@ -9,6 +9,7 @@ wwp = {};
 
   wwp.initializeDrawingArea = function(containerElementId) {
     paper = new Raphael(containerElementId);
+    return paper;
   };
 
 })();
