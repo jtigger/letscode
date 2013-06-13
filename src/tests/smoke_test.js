@@ -77,7 +77,7 @@ exports["When the server is started"] = nodeunit.testCase({
   "can serve the Home Page.": function(test) {
     test.expect(1);
     // if the following fails in any way, an exception is thrown
-    httpGet("http://localhost:" + port + "/index", function(response) {
+    httpGet("http://localhost:" + port + "/index.html", function(response) {
       test.ok(response.content.indexOf("pageId=Home") !== -1, "Could not find 'Home Page' marker in response.  Response was = \"" + response.content + "\".");
       test.done();
     });
