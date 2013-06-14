@@ -9,7 +9,12 @@ wwp = {};
 
   wwp.initializeDrawingArea = function(containerElementId) {
     paper = new Raphael(containerElementId);
+
     return paper;
+  };
+
+  wwp.drawLine = function(startX, startY, endX, endY) {
+    paper.path("M"+startX+","+startY+"L"+endX+","+endY);
   };
 
 })();
