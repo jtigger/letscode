@@ -64,7 +64,6 @@
 
       paper = wwp.initializeDrawingArea(drawingArea[0]);
 
-
       wwp.drawLine(200, 30, 200, 20);
 
       paper.forEach(function(element) {
@@ -81,7 +80,6 @@
         }
         expect(actualPath).to.equal(expectedPath);
       });
-
     });
   });
 })();
