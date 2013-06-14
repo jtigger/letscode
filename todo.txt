@@ -9,20 +9,19 @@ Minimum Marketable Feature:
 - collaborative painting wiki
 
 User Stories:
-[ ] "Draw a Line" (pre-defined)
 [ ] "Draw a Line" (via mouse)
 [ ] "Draw a Line" (via touch)
 [ ] "Draw multiple lines"
 
 
 Future Ideas:
-[ ]
 [ ] add an assembly step in the build to merge all code into a single package-able/deployable web app.
     (mostly, this is about being able to keep source files in whatever organization I want, but then be able
      to move stuff around for an actual deployment, like jquery).
 [ ] set time limits for tests.
 
 DONE:
+[x] "Draw a Line" (pre-defined)
 [x] "Canvas"
     As a WeeWikiPaint author
     I want to see a drawing canvas
