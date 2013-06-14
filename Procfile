@@ -1,1 +1,1 @@
-web: node ./src/code/server/weewikipaint ./src/code/web $PORT
+web: node ./src/code/server/weewikipaint $PORT ./src/code/web

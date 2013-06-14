@@ -4,11 +4,11 @@
 var server = require("./server.js");
 
 if(process.argv.length < 3) {
-  throw new Error("Invalid number of arguments.");
+  throw new Error("Missing arguments.  It's weewikipaint (port) (root-dir).");
 }
 
-var rootDirectory = process.argv[2];
-var port = process.argv[3];
+var port = process.argv[2];
+var rootDirectory = process.argv[3];
 
 server.start(port, rootDirectory, function() {
   console.log("Server started successfully.");

@@ -34,8 +34,8 @@ exports["Configuring the server"] = nodeunit.testCase({
   "when we specify an existing filesystem directory as the web root, the server serves files from that directory": function(test) {
     test.expect(1);
     var webRootDirectory = __dirname + "/../../../build/test/sample-web-root";
-    var pathname = "foo";
-    var filename = webRootDirectory + "/" + pathname + ".html";
+    var pathname = "foo.html";
+    var filename = webRootDirectory + "/" + pathname;
     fs.mkdirSync(webRootDirectory);
     fs.writeFileSync(filename, "(some HTML)");
 
@@ -77,13 +77,13 @@ exports["Given the server is running"] = nodeunit.testCase({
 });
 
 exports["Given the server is running, has a web root configured and has some files"] = (function() {
-  var pathname = "somefile";
+  var pathname = "somefile.html";
   var filename;
 
   return nodeunit.testCase({
     setUp: function(done) {
       httpServer = server.start(port, function() {
-        filename = httpServer.rootDirectory + "/" + pathname + ".html";
+        filename = httpServer.rootDirectory + "/" + pathname;
         fs.writeFileSync(filename, "Hello, world.");
         done();
       });

@@ -19,8 +19,7 @@ function writeFile(response, filename, done) {
 }
 
 function fileSystemPathForUrl(urlPathname) {
-  var fileExtension = ".html";
-  return fileRootDirectory + "/" + urlPathname + fileExtension;
+  return fileRootDirectory + "/" + urlPathname;
 }
 
 function serveFileForUrl(response, urlPath) {
@@ -37,7 +36,7 @@ function serveFileForUrl(response, urlPath) {
         response.end();
       } else {
         response.statusCode = 404;
-        serveFileForUrl(response, "404");
+        serveFileForUrl(response, "404.html");
       }
     }
   });
