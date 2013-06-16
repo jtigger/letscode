@@ -13,7 +13,9 @@ wwp = {};
     paper = new Raphael(containerElementId);
 
     $(containerElementId).mousedown(function(event) {
-      startPosition = { x: event.offsetX, y:event.offsetY };
+      startPosition = { x: event.pageX - $(containerElementId).offset().left,
+        y: event.pageY - $(containerElementId).offset().top};
+
       draftLine = wwp.drawLine(startPosition.x, startPosition.y, startPosition.x, startPosition.y);
       draftLine.attr("stroke-opacity", "0.1");
     });
@@ -21,7 +23,9 @@ wwp = {};
     $(containerElementId).mousemove(function(event) {
       if(startPosition !== null) {
         var attrs = draftLine.attr();
-        attrs.path[1] = ["L", event.offsetX, event.offsetY];
+        var offset = { x: event.pageX - $(containerElementId).offset().left,
+          y: event.pageY - $(containerElementId).offset().top};
+        attrs.path[1] = ["L", offset.x, offset.y];
         draftLine.attr(attrs);
       }
     });
