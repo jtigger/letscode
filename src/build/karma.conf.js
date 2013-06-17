@@ -10,6 +10,7 @@ files = [
   MOCHA,
   MOCHA_ADAPTER,
   "../../lib/jquery-1.10.1.js",
+  "../../lib/jquery.simulate-25938de.js",
   "../../lib/raphael-min-2.1.0.js",
   "../../node_modules/expect.js/expect.js",
   "../../src/code/web/scripts/*.js",

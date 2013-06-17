@@ -10,6 +10,8 @@ Minimum Marketable Feature:
 
 User Stories:
 [ ] "Draw a Line" (via mouse)
+    [ ] Test-Drive opacity-during-drag
+    [x] refactor setup code in tests
 [ ] "Draw a Line" (via touch)
 [ ] "Draw multiple lines"
 
