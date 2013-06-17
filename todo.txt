@@ -9,9 +9,7 @@ Minimum Marketable Feature:
 - collaborative painting wiki
 
 User Stories:
-[ ] "Draw a Line" (via mouse)
-    [ ] Test-Drive opacity-during-drag
-    [x] refactor setup code in tests
+[ ] "Draw a Line with draw-help"
 [ ] "Draw a Line" (via touch)
 [ ] "Draw multiple lines"
 
@@ -23,6 +21,8 @@ Future Ideas:
 [ ] set time limits for tests.
 
 DONE:
+[x] "Draw a Line" (via mouse)
+    [x] refactor setup code in tests
 [x] "Draw a Line" (pre-defined)
 [x] "Canvas"
     As a WeeWikiPaint author
