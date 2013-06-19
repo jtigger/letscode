@@ -70,61 +70,60 @@
       expect(totalElements).to.be(1);
     });
 
-    it("should display that drawn line with the dimensions given.", function() {
+    it("drawing a line inserts a 'path' into the document.", function() {
       var pathValues = [
         ['M', 200, 30],
         ['L', 200, 20]
       ];
-      var pathValuesAsString = "M200,30L200,20";
+      var elements, element;
 
       wwp.drawLine(200, 30, 200, 20);
 
-      paper.forEach(function(element) {
-        var actualPath;
-        var expectedPath;
+      elements = getElementsOnPaper(paper);
+      expect(elements.length).to.equal(1);
+      element = elements[0];
 
-        expect(element.attr()).to.have.property("path");
-        if (Raphael.type === "SVG") {
-          actualPath = JSON.stringify(element.attr().path);
-          expectedPath = JSON.stringify(pathValues);
-        } else {
-          actualPath = element.attr().path;
-          expectedPath = pathValuesAsString;
-        }
-        expect(actualPath).to.equal(expectedPath);
-      });
+      expect(element.attr()).to.have.property("path");
+      expect(pathToString(element.attr().path)).to.equal(pathToString(pathValues));
     });
 
-    it("when the user clicks inside the drawing area, WWP puts a line starting there.", function() {
+    it("when user clicks, drags, and lets go, WWP draws a line that starts where they clicked and ends where they had let go.", function() {
       var expectedPathValues = [
         ['M', 100, 200],
         ['L', 150, 250]
       ];
-      var expectedPathValuesAsString = "M100,200L150,250";
-      var actualPaths, actualPath, expectedPath;
+      clickAndDragAcrossPath(expectedPathValues, drawingArea);
 
-      var startingPosition = calcAbsolutePagePosition({x: expectedPathValues[0][1], y: expectedPathValues[0][2]}, drawingArea);
-      var endingPosition = calcAbsolutePagePosition({x: expectedPathValues[1][1], y: expectedPathValues[1][2]}, drawingArea);
+      var path = getElementsOnPaper(paper)[0];
 
-      drawingArea.trigger(createMouseEvent("mousedown", startingPosition));
-      drawingArea.trigger(createMouseEvent("mouseup", endingPosition));
+      expect(pathToString(path.attr().path)).to.equal(pathToString(expectedPathValues));
+    });
 
-      actualPaths = getElementsOnPaper(paper);
-
-      expect(actualPaths.length).to.be(1);
-      actualPaths.forEach(function(path) {
-        expect(path.attr()).to.have.property("path");
-        if (Raphael.type === "SVG") {
-          actualPath = JSON.stringify(path.attr().path);
-          expectedPath = JSON.stringify(expectedPathValues);
-        } else {
-          actualPath = path.attr().path;
-          expectedPath = expectedPathValuesAsString;
-        }
-        expect(actualPath).to.equal(expectedPath);
-      });
+    it("when determining the location of a line, WWP accounts for padding, margin and border of the canvas' container.", function() {
     });
   });
+
+  function pathToString(path) {
+    var pathAsString;
+    if (Raphael.type === "SVG") {
+      pathAsString = JSON.stringify(path);
+    } else {
+      if ($.isArray(path)) {
+        pathAsString = path[0][0] + path[0][1] + "," + path[0][2] +
+          path[1][0] + path[1][1] + "," + path[1][2];
+      } else {
+        pathAsString = path;  // assume path is already a string
+      }
+    }
+    return pathAsString;
+  }
+
+  function clickAndDragAcrossPath(pathValues, drawingArea) {
+    var startingPosition = calcAbsolutePagePosition({x: pathValues[0][1], y: pathValues[0][2]}, drawingArea);
+    var endingPosition = calcAbsolutePagePosition({x: pathValues[1][1], y: pathValues[1][2]}, drawingArea);
+    drawingArea.trigger(createMouseEvent("mousedown", startingPosition));
+    drawingArea.trigger(createMouseEvent("mouseup", endingPosition));
+  }
 
   function calcAbsolutePagePosition(relativePosition, element) {
     return { pageX: $(element).offset().left + relativePosition.x,
