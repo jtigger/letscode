@@ -57,19 +57,7 @@
       expect(paper.width).to.be(400);
     });
 
-    it("should display a drawn line", function() {
-      var totalElements;
-
-      wwp.drawLine(20, 30, 200, 20);
-
-      totalElements = 0;
-      paper.forEach(function() {
-        totalElements++;
-      });
-      expect(totalElements).to.be(1);
-    });
-
-    it("drawing a line inserts a 'path' into the document.", function() {
+    it("drawing a line puts a 'path' on the canvas.", function() {
       var pathValues = [
         ['M', 200, 30],
         ['L', 200, 20]
@@ -99,38 +87,15 @@
     });
 
     it("when determining the location of a line, WWP accounts for padding of the canvas' container.", function() {
-      var topPadding = 20;
-      var leftPadding = 7;
-      var mousePath = [
-        ['M', 100, 200],
-        ['L', 150, 250]
-      ];
-      var expectedPath = [
-        ['M', 100 - leftPadding, 200 - topPadding],
-        ['L', 150 - leftPadding, 250 - topPadding]
-      ];
-
-      drawingArea.attr("style", function(index, value) {
-        return value + "; padding-left: " + leftPadding + "px; padding-top: " + topPadding + "px";
-      });
-
-      clickAndDragAcrossPath(mousePath, drawingArea);
-
-      var path = getElementsOnPaper(paper)[0];
-      expect(pathToString(path.attr().path)).to.be(pathToString(expectedPath));
-    });
-
-    it("when determining the location of a line, WWP accounts for the padding and border of the canvas' container.", function() {
-      var topPadding = 7;
+      var topPadding = 11;
       var leftPadding = 19;
-
       var mousePath = [
-        ['M', 100, 200],
-        ['L', 150, 250]
+        ['M', 101, 223],
+        ['L', 113, 251]
       ];
       var expectedPath = [
-        ['M', 100 - leftPadding, 200 - topPadding],
-        ['L', 150 - leftPadding, 250 - topPadding]
+        ['M', mousePath[0][1] - leftPadding, mousePath[0][2] - topPadding],
+        ['L', mousePath[1][1] - leftPadding, mousePath[1][2] - topPadding]
       ];
 
       drawingArea.attr("style", function(index, value) {
