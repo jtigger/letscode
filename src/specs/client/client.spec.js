@@ -53,7 +53,6 @@
     });
 
     it("should match the dimensions of the enclosing div", function() {
-
       expect(paper.height).to.be(200);
       expect(paper.width).to.be(400);
     });
@@ -99,25 +98,81 @@
       expect(pathToString(path.attr().path)).to.equal(pathToString(expectedPathValues));
     });
 
-    it("when determining the location of a line, WWP accounts for padding, margin and border of the canvas' container.", function() {
+    it("when determining the location of a line, WWP accounts for padding of the canvas' container.", function() {
+      var topPadding = 20;
+      var leftPadding = 7;
+      var mousePath = [
+        ['M', 100, 200],
+        ['L', 150, 250]
+      ];
+      var expectedPath = [
+        ['M', 100 - leftPadding, 200 - topPadding],
+        ['L', 150 - leftPadding, 250 - topPadding]
+      ];
+
+      drawingArea.attr("style", function(index, value) {
+        return value + "; padding-left: " + leftPadding + "px; padding-top: " + topPadding + "px";
+      });
+
+      clickAndDragAcrossPath(mousePath, drawingArea);
+
+      var path = getElementsOnPaper(paper)[0];
+      expect(pathToString(path.attr().path)).to.be(pathToString(expectedPath));
     });
+
+    it("when determining the location of a line, WWP accounts for the padding and border of the canvas' container.", function() {
+      var topPadding = 7;
+      var leftPadding = 19;
+
+      var mousePath = [
+        ['M', 100, 200],
+        ['L', 150, 250]
+      ];
+      var expectedPath = [
+        ['M', 100 - leftPadding, 200 - topPadding],
+        ['L', 150 - leftPadding, 250 - topPadding]
+      ];
+
+      drawingArea.attr("style", function(index, value) {
+        return value + "; padding-left: " + leftPadding + "px; padding-top: " + topPadding + "px";
+      });
+
+      clickAndDragAcrossPath(mousePath, drawingArea);
+
+      var path = getElementsOnPaper(paper)[0];
+      expect(pathToString(path.attr().path)).to.be(pathToString(expectedPath));
+    });
+
   });
 
+  /**
+   * Generates String representation for a SVG Path, handling browser differences.
+   *
+   * @param path either a Raphael Element that is a Path -OR- an array representing the path values.
+   * @returns {String} the value as a string.
+   */
   function pathToString(path) {
     var pathAsString;
-    if (Raphael.type === "SVG") {
+    if (Raphael.type === "SVG") {  // in this mode, all paths are objects
       pathAsString = JSON.stringify(path);
     } else {
       if ($.isArray(path)) {
         pathAsString = path[0][0] + path[0][1] + "," + path[0][2] +
           path[1][0] + path[1][1] + "," + path[1][2];
       } else {
-        pathAsString = path;  // assume path is already a string
+        pathAsString = path;  // assumes path is already a string (e.g. in IE 8.0)
       }
     }
     return pathAsString;
   }
 
+  /**
+   * Generates and dispatches browser events that simulates a user clicking on the starting position of the path
+   * and letting go at the ending position of the path.
+   *
+   * @param pathValues [['M', AAA, BBB], ['L', XXX, YYY]]
+   * @param drawingArea the HTML element containing the Raphael Paper (typically a DIV).
+   */
   function clickAndDragAcrossPath(pathValues, drawingArea) {
     var startingPosition = calcAbsolutePagePosition({x: pathValues[0][1], y: pathValues[0][2]}, drawingArea);
     var endingPosition = calcAbsolutePagePosition({x: pathValues[1][1], y: pathValues[1][2]}, drawingArea);
@@ -126,7 +181,7 @@
   }
 
   function calcAbsolutePagePosition(relativePosition, element) {
-    return { pageX: $(element).offset().left + relativePosition.x,
+    return  { pageX: $(element).offset().left + relativePosition.x,
       pageY: $(element).offset().top + relativePosition.y };
   }
 

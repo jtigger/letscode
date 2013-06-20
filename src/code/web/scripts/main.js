@@ -21,7 +21,11 @@ wwp = {};
       var endOffset = { x: event.pageX - $(containerElementId).offset().left,
         y: event.pageY - $(containerElementId).offset().top};
 
-      wwp.drawLine(startOffset.x, startOffset.y, endOffset.x, endOffset.y);
+      var leftPadding = parseInt($(containerElementId).css("padding-left"), 10);
+      var topPadding = parseInt($(containerElementId).css("padding-top"), 10);
+
+      wwp.drawLine(startOffset.x - leftPadding, startOffset.y - topPadding,
+        endOffset.x - leftPadding, endOffset.y - topPadding);
       startEvent = null;
     });
 
@@ -29,7 +33,7 @@ wwp = {};
   };
 
   wwp.drawLine = function(startX, startY, endX, endY) {
-    paper.path("M"+startX+","+startY+"L"+endX+","+endY);
+    paper.path("M" + startX + "," + startY + "L" + endX + "," + endY);
   };
 
 })();
