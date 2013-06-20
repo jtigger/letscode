@@ -9,6 +9,7 @@ wwp = {};
   var startEvent = null;
 
   wwp.initializeDrawingArea = function(containerElementId) {
+    var paperContainer = $(containerElementId);
     paper = new Raphael(containerElementId);
 
     $(containerElementId).mousedown(function(event) {
@@ -16,16 +17,10 @@ wwp = {};
     });
 
     $(containerElementId).mouseup(function(event) {
-      var startOffset = { x: startEvent.pageX - $(containerElementId).offset().left,
-        y: startEvent.pageY - $(containerElementId).offset().top};
-      var endOffset = { x: event.pageX - $(containerElementId).offset().left,
-        y: event.pageY - $(containerElementId).offset().top};
+      var startOffset = calcPositionOnPaper(startEvent, paperContainer);
+      var endOffset = calcPositionOnPaper(event, paperContainer);
 
-      var leftPadding = parseInt($(containerElementId).css("padding-left"), 10);
-      var topPadding = parseInt($(containerElementId).css("padding-top"), 10);
-
-      wwp.drawLine(startOffset.x - leftPadding, startOffset.y - topPadding,
-        endOffset.x - leftPadding, endOffset.y - topPadding);
+      wwp.drawLine(startOffset.x, startOffset.y, endOffset.x, endOffset.y);
       startEvent = null;
     });
 
@@ -35,5 +30,22 @@ wwp = {};
   wwp.drawLine = function(startX, startY, endX, endY) {
     paper.path("M" + startX + "," + startY + "L" + endX + "," + endY);
   };
+
+  /**
+   * @param {{pageX: number, pageY:number}} absolutePosition position relative to the document (aka {pageX, pageY}).
+   * @param {jQuery} paperContainer the container of the Raphael paper.
+   * @return {{x:number, y:number}} of the position within the Raphael Paper that corresponds to absolutePosition.
+   */
+  function calcPositionOnPaper(absolutePosition, paperContainer) {
+    var positionOfContainerOnPage = { x: paperContainer.offset().left,
+      y: paperContainer.offset().top};
+
+    var leftPadding = parseInt(paperContainer.css("padding-left"), 10);
+    var topPadding = parseInt(paperContainer.css("padding-top"), 10);
+
+    return { x: absolutePosition.pageX - positionOfContainerOnPage.x - leftPadding,
+      y: absolutePosition.pageY - positionOfContainerOnPage.y - topPadding };
+  }
+
 
 })();
