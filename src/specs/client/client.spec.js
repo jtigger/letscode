@@ -64,7 +64,7 @@
       ];
       var elements, element;
 
-      wwp.drawLine(200, 30, 200, 20);
+      wwp.drawLine({x:200, y: 30}, {x:200, y:20});
 
       elements = getElementsOnPaper(paper);
       expect(elements.length).to.equal(1);

@@ -20,15 +20,20 @@ wwp = {};
       var startOffset = calcPositionOnPaper(startEvent, paperContainer);
       var endOffset = calcPositionOnPaper(event, paperContainer);
 
-      wwp.drawLine(startOffset.x, startOffset.y, endOffset.x, endOffset.y);
+      wwp.drawLine(startOffset, endOffset);
       startEvent = null;
     });
 
     return paper;
   };
 
-  wwp.drawLine = function(startX, startY, endX, endY) {
-    paper.path("M" + startX + "," + startY + "L" + endX + "," + endY);
+  /**
+   * Draws a line on the Paper
+   * @param {{x:number, y:number}} start position on the Paper to start the line.
+   * @param {{x:number, y:number}} end position on the paper to end the line.
+   */
+  wwp.drawLine = function(start, end) {
+    paper.path("M" + start.x + "," + start.y + "L" + end.x + "," + end.y);
   };
 
   /**
