@@ -16,7 +16,7 @@ wwp = {};
       startPosition = { x: event.pageX - $(containerElementId).offset().left,
         y: event.pageY - $(containerElementId).offset().top};
 
-      draftLine = wwp.drawLine(startPosition.x, startPosition.y, startPosition.x, startPosition.y);
+      draftLine = wwp.drawLine(startPosition, startPosition);
       draftLine.attr("stroke-opacity", "0.1");
     });
 

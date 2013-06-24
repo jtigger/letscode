@@ -9,27 +9,70 @@ wwp = {};
   var startEvent = null;
 
   wwp.initializeDrawingArea = function(containerElementId) {
+    var paperContainer = $(containerElementId);
+    var draftLine = null;
     paper = new Raphael(containerElementId);
 
     $(containerElementId).mousedown(function(event) {
       startEvent = event;
+      var positionWithinCanvas = calcPositionOnPaper(event, paperContainer);
+
+      if (!draftLine) {
+        draftLine = wwp.drawLine(positionWithinCanvas, positionWithinCanvas);
+        draftLine.attr("stroke-opacity", "0.1");
+      }
     });
 
-    $(containerElementId).mouseup(function(event) {
-      var startOffset = { x: startEvent.pageX - $(containerElementId).offset().left,
-        y: startEvent.pageY - $(containerElementId).offset().top};
-      var endOffset = { x: event.pageX - $(containerElementId).offset().left,
-        y: event.pageY - $(containerElementId).offset().top};
+    $(containerElementId).mousemove(function(event) {
+      function setEndPoint(path, position) {
+        var attrs = path.attr();
+        if (Raphael.type === "SVG") {
+          attrs.path[1] = ["L", position.x, position.y];
+        } else {
+          attrs.path = attrs.path.substring(0, attrs.path.indexOf("L") + 1) + position.x + "," + position.y;
+        }
+        path.attr(attrs);
+      }
 
-      wwp.drawLine(startOffset.x, startOffset.y, endOffset.x, endOffset.y);
-      startEvent = null;
+      if (draftLine) {
+        var offset = { x: event.pageX - $(containerElementId).offset().left,
+          y: event.pageY - $(containerElementId).offset().top};
+
+        setEndPoint(draftLine, offset);
+      }
+    });
+
+    $(containerElementId).mouseup(function() {
+      draftLine.attr("stroke-opacity", "1.0");
+      draftLine = null;
     });
 
     return paper;
   };
 
-  wwp.drawLine = function(startX, startY, endX, endY) {
-    paper.path("M"+startX+","+startY+"L"+endX+","+endY);
+  /**
+   * Draws a line on the Paper
+   * @param {{x:number, y:number}} start position on the Paper to start the line.
+   * @param {{x:number, y:number}} end position on the paper to end the line.
+   */
+  wwp.drawLine = function(start, end) {
+    return paper.path("M" + start.x + "," + start.y + "L" + end.x + "," + end.y);
   };
+
+  /**
+   * @param {{pageX: number, pageY:number}} absolutePosition position relative to the document (aka {pageX, pageY}).
+   * @param {jQuery} paperContainer the container of the Raphael paper.
+   * @return {{x:number, y:number}} of the position within the Raphael Paper that corresponds to absolutePosition.
+   */
+  function calcPositionOnPaper(absolutePosition, paperContainer) {
+    var positionOfContainerOnPage = { x: paperContainer.offset().left,
+      y: paperContainer.offset().top};
+
+    var leftPadding = parseInt(paperContainer.css("padding-left"), 10);
+    var topPadding = parseInt(paperContainer.css("padding-top"), 10);
+
+    return { x: absolutePosition.pageX - positionOfContainerOnPage.x - leftPadding,
+      y: absolutePosition.pageY - positionOfContainerOnPage.y - topPadding };
+  }
 
 })();
