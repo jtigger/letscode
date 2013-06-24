@@ -17,8 +17,10 @@ wwp = {};
       startEvent = event;
       var positionWithinCanvas = calcPositionOnPaper(event, paperContainer);
 
-      draftLine = wwp.drawLine(positionWithinCanvas, positionWithinCanvas);
-      draftLine.attr("stroke-opacity", "0.1");
+      if (!draftLine) {
+        draftLine = wwp.drawLine(positionWithinCanvas, positionWithinCanvas);
+        draftLine.attr("stroke-opacity", "0.1");
+      }
     });
 
     $(containerElementId).mousemove(function(event) {

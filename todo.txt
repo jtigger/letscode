@@ -9,10 +9,9 @@ Minimum Marketable Feature:
 - collaborative painting wiki
 
 User Stories:
-[ ] "Draw a Line with 'draw-help'"
-
 [ ] "Draw a Line" (via touch)
 [ ] "Draw multiple lines"
+[ ] "Abort line-draw" (when user hits Esc)
 
 
 Future Ideas:
@@ -23,6 +22,7 @@ Future Ideas:
 [ ] set time limits for tests.
 
 DONE:
+[x] "Draw a Line with 'draw-help'"
 [x] "Draw a Line" (via mouse)
     [x] refactor setup code in tests
 [x] "Draw a Line" (pre-defined)

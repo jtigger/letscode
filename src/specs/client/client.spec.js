@@ -117,12 +117,20 @@
             simulateMouseUpWithin(drawingArea, endingPosition);
           });
 
-          it("should fix the dimensions of the line", function() {
-
-          });
-
           it("should make the line fully opaque.", function() {
             expect(pathOfLine.attr()["stroke-opacity"]).to.be("1.0");
+          });
+        });
+
+        describe("and drags outside of the canvas, and lets go, and clicks back in it", function() {
+          beforeEach(function() {
+            // this assumes that the "mousemove" and "mouseup" events have no affect on WWP's behavior, here.
+            simulateMouseDownWithin(drawingArea, endingPosition);
+            elements = getElementsOnPaper(paper);
+          });
+
+          it("should continue to adjust the same line (and not create a new one)", function() {
+             expect(elements.length).to.be(1);
           });
         });
 
