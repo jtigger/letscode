@@ -145,7 +145,7 @@ task("test.unit.client", [], function() {
   jake.logger.logTaskStart("test.unit.client");
   karma.run(function(results) {
     if(results instanceof Error) {
-      fail("Client-side tests failed with \"" + results.toString() + "\" (also, see above).");
+      fail("Client-side tests failed (see above).");
     }
     supportedBrowsers.forEach(function(supportedBrowser) {
       if (results.indexOf(supportedBrowser) === -1) {
