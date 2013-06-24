@@ -4,7 +4,7 @@
 (function() {
   "use strict";
 
-  describe("wee canvas", function() {
+  describe("The WeeWikiPaint canvas,", function() {
     var drawingArea;
     var paper;
     var monkeyPatchedArray = false;
@@ -57,55 +57,118 @@
       expect(paper.width).to.be(400);
     });
 
-    it("drawing a line puts a 'path' on the canvas.", function() {
+    it("when told to draw a line, should add a 'path' to the canvas.", function() {
       var pathValues = [
         ['M', 200, 30],
         ['L', 200, 20]
       ];
       var elements, element;
 
-      wwp.drawLine({x:200, y: 30}, {x:200, y:20});
+      wwp.drawLine({x: pathValues[0][1], y: pathValues[0][2]}, {x: pathValues[1][1], y: pathValues[1][2]});
 
       elements = getElementsOnPaper(paper);
       expect(elements.length).to.equal(1);
       element = elements[0];
 
       expect(element.attr()).to.have.property("path");
-      expect(pathToString(element.attr().path)).to.equal(pathToString(pathValues));
+      expect(pathAsString(element.attr().path)).to.equal(pathAsString(pathValues));
     });
 
-    it("when user clicks, drags, and lets go, WWP draws a line that starts where they clicked and ends where they had let go.", function() {
-      var expectedPathValues = [
-        ['M', 100, 200],
-        ['L', 150, 250]
-      ];
-      clickAndDragAcrossPath(expectedPathValues, drawingArea);
+    describe("when the user clicks within it,", function() {
+      var startingPosition = {x: 100, y: 10};
+      var endingPosition = {x: 200, y: 20};
+//      var pathValues = [
+//        ['M', startingPosition.x, startingPosition.y],
+//        ['L', endingPosition.x, endingPosition.y]
+//      ];
 
-      var path = getElementsOnPaper(paper)[0];
+      beforeEach(function() {
+        function simulateMouseDownWithin(element, relativePosition) {
+          element.trigger(createMouseEvent("mousedown", calcAbsolutePagePosition(relativePosition, element)));
+        }
 
-      expect(pathToString(path.attr().path)).to.equal(pathToString(expectedPathValues));
+        simulateMouseDownWithin(drawingArea, startingPosition);
+      });
+
+      it("should draw a line.", function() {
+        var elements = getElementsOnPaper(paper);
+        var pathOfLine = elements[0];
+        expect(elements.length).to.equal(1);
+        expect(pathOfLine.attr()).to.have.property("path");
+      });
+
+      describe("and drags to another point within it,", function() {
+        var elements;
+        var pathOfLine;
+
+        beforeEach(function() {
+          function simulateMouseMoveWithin(element, relativePosition) {
+            element.trigger(createMouseEvent("mousemove", calcAbsolutePagePosition(relativePosition, element)));
+          }
+
+          simulateMouseMoveWithin(drawingArea, endingPosition);
+          elements = getElementsOnPaper(paper);
+          pathOfLine = elements[0];
+        });
+
+        it("should adjust the line to track the mouse", function() {
+          var endpointOfLine;
+          var pathValue = pathAsArray(pathOfLine.attr().path);
+
+          endpointOfLine = {x: pathValue[1][1], y: pathValue[1][2]};
+
+          expect(endpointOfLine).to.eql(endingPosition);
+        });
+
+        it("should make the line semi-transparent", function() {
+          expect(pathOfLine.attr()["stroke-opacity"]).to.be("0.1");
+        });
+
+      });
+
+      describe("and lets go,", function() {
+        it("should fix the dimensions of the line", function() {
+
+        });
+
+        it("should make the line fully opaque.", function() {
+
+        });
+      });
+    });
+
+    it("when user clicks, drags, and lets go, draws a line that starts where they clicked and ends where they had let go.", function() {
+//      var expectedPathValues = [
+//        ['M', 100, 200],
+//        ['L', 150, 250]
+//      ];
+//      clickAndDragAcrossPath(expectedPathValues, drawingArea);
+//
+//      var path = getElementsOnPaper(paper)[0];
+//
+//      expect(pathAsString(path.attr().path)).to.equal(pathAsString(expectedPathValues));
     });
 
     it("when determining the location of a line, WWP accounts for padding of the canvas' container.", function() {
-      var topPadding = 11;
-      var leftPadding = 19;
-      var mousePath = [
-        ['M', 101, 223],
-        ['L', 113, 251]
-      ];
-      var expectedPath = [
-        ['M', mousePath[0][1] - leftPadding, mousePath[0][2] - topPadding],
-        ['L', mousePath[1][1] - leftPadding, mousePath[1][2] - topPadding]
-      ];
-
-      drawingArea.attr("style", function(index, value) {
-        return value + "; padding-left: " + leftPadding + "px; padding-top: " + topPadding + "px";
-      });
-
-      clickAndDragAcrossPath(mousePath, drawingArea);
-
-      var path = getElementsOnPaper(paper)[0];
-      expect(pathToString(path.attr().path)).to.be(pathToString(expectedPath));
+//      var topPadding = 11;
+//      var leftPadding = 19;
+//      var mousePath = [
+//        ['M', 101, 223],
+//        ['L', 113, 251]
+//      ];
+//      var expectedPath = [
+//        ['M', mousePath[0][1] - leftPadding, mousePath[0][2] - topPadding],
+//        ['L', mousePath[1][1] - leftPadding, mousePath[1][2] - topPadding]
+//      ];
+//
+//      drawingArea.attr("style", function(index, value) {
+//        return value + "; padding-left: " + leftPadding + "px; padding-top: " + topPadding + "px";
+//      });
+//
+//      clickAndDragAcrossPath(mousePath, drawingArea);
+//
+//      var path = getElementsOnPaper(paper)[0];
+//      expect(pathAsString(path.attr().path)).to.be(pathAsString(expectedPath));
     });
 
   });
@@ -113,23 +176,41 @@
   /**
    * Generates String representation for a SVG Path, handling browser differences.
    *
-   * @param path either a Raphael Element that is a Path -OR- an array representing the path values.
+   * @param { [[],[]] | String } path either the "path" attribute of a Raphael Element that is a Path -OR- an array representing the path values.
    * @returns {String} the value as a string.
    */
-  function pathToString(path) {
-    var pathAsString;
+  function pathAsString(path) {
+    var result;
     if (Raphael.type === "SVG") {  // in this mode, all paths are objects
-      pathAsString = JSON.stringify(path);
+      result = JSON.stringify(path);
     } else {
       if ($.isArray(path)) {
-        pathAsString = path[0][0] + path[0][1] + "," + path[0][2] +
+        result = path[0][0] + path[0][1] + "," + path[0][2] +
           path[1][0] + path[1][1] + "," + path[1][2];
       } else {
-        pathAsString = path;  // assumes path is already a string (e.g. in IE 8.0)
+        result = path;  // assumes path is already a string (e.g. in IE 8.0)
       }
     }
-    return pathAsString;
+    return result;
   }
+
+  /**
+   * Generates an Array representation for a SVG path, handling browser differences.
+   *
+   * @param { [[],[]] | String } pathAsString either the "path" attribute of a Raphael Element that is a Path -OR- a string representing path values.
+   * @returns { [[],[]] } the value as an array (e.g. [["M", 7, 4], ["L", 19, 42]]).
+   */
+  function pathAsArray(pathAsString) {
+    var pathValues;
+    if(pathAsString instanceof Array) {
+      pathValues = pathAsString;
+    } else {
+      var pathTokens = pathAsString.match(/([M])(\d+),(\d+)([L])(\d+),(\d+)/);
+      pathValues = [[pathTokens[1], pathTokens[2], pathTokens[3]], [pathTokens[4], pathTokens[5], pathTokens[6]]];
+    }
+    return pathValues;
+  }
+
 
   /**
    * Generates and dispatches browser events that simulates a user clicking on the starting position of the path
@@ -138,13 +219,21 @@
    * @param pathValues [['M', AAA, BBB], ['L', XXX, YYY]]
    * @param drawingArea the HTML element containing the Raphael Paper (typically a DIV).
    */
-  function clickAndDragAcrossPath(pathValues, drawingArea) {
-    var startingPosition = calcAbsolutePagePosition({x: pathValues[0][1], y: pathValues[0][2]}, drawingArea);
-    var endingPosition = calcAbsolutePagePosition({x: pathValues[1][1], y: pathValues[1][2]}, drawingArea);
-    drawingArea.trigger(createMouseEvent("mousedown", startingPosition));
-    drawingArea.trigger(createMouseEvent("mouseup", endingPosition));
-  }
+  /*
+   function clickAndDragAcrossPath(pathValues, drawingArea) {
+   // TODO: emit "mousemove" events along the paths.
+   var startingPosition = calcAbsolutePagePosition({x: pathValues[0][1], y: pathValues[0][2]}, drawingArea);
+   var endingPosition = calcAbsolutePagePosition({x: pathValues[1][1], y: pathValues[1][2]}, drawingArea);
+   drawingArea.trigger(createMouseEvent("mousedown", startingPosition));
+   drawingArea.trigger(createMouseEvent("mouseup", endingPosition));
+   }
+   */
 
+  /**
+   * @param {{x: number, y:number}} relativePosition
+   * @param element jQuery selector of the element to which relativePosition is relative.
+   * @returns {{pageX: number, pageY: number}} the corresponding position relative to the document.
+   */
   function calcAbsolutePagePosition(relativePosition, element) {
     return  { pageX: $(element).offset().left + relativePosition.x,
       pageY: $(element).offset().top + relativePosition.y };

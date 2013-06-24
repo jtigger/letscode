@@ -9,7 +9,8 @@ Minimum Marketable Feature:
 - collaborative painting wiki
 
 User Stories:
-[ ] "Draw a Line with draw-help"
+[ ] "Draw a Line with 'draw-help'"
+
 [ ] "Draw a Line" (via touch)
 [ ] "Draw multiple lines"
 
