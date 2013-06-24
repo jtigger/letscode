@@ -77,16 +77,8 @@
     describe("when the user clicks within it,", function() {
       var startingPosition = {x: 100, y: 10};
       var endingPosition = {x: 200, y: 20};
-//      var pathValues = [
-//        ['M', startingPosition.x, startingPosition.y],
-//        ['L', endingPosition.x, endingPosition.y]
-//      ];
 
       beforeEach(function() {
-        function simulateMouseDownWithin(element, relativePosition) {
-          element.trigger(createMouseEvent("mousedown", calcAbsolutePagePosition(relativePosition, element)));
-        }
-
         simulateMouseDownWithin(drawingArea, startingPosition);
       });
 
@@ -102,10 +94,6 @@
         var pathOfLine;
 
         beforeEach(function() {
-          function simulateMouseMoveWithin(element, relativePosition) {
-            element.trigger(createMouseEvent("mousemove", calcAbsolutePagePosition(relativePosition, element)));
-          }
-
           simulateMouseMoveWithin(drawingArea, endingPosition);
           elements = getElementsOnPaper(paper);
           pathOfLine = elements[0];
@@ -124,17 +112,22 @@
           expect(pathOfLine.attr()["stroke-opacity"]).to.be("0.1");
         });
 
-      });
+        describe("and lets go,", function() {
+          beforeEach(function() {
+            simulateMouseUpWithin(drawingArea, endingPosition);
+          });
 
-      describe("and lets go,", function() {
-        it("should fix the dimensions of the line", function() {
+          it("should fix the dimensions of the line", function() {
 
+          });
+
+          it("should make the line fully opaque.", function() {
+            expect(pathOfLine.attr()["stroke-opacity"]).to.be("1.0");
+          });
         });
 
-        it("should make the line fully opaque.", function() {
-
-        });
       });
+
     });
 
     it("when user clicks, drags, and lets go, draws a line that starts where they clicked and ends where they had let go.", function() {
@@ -237,6 +230,18 @@
   function calcAbsolutePagePosition(relativePosition, element) {
     return  { pageX: $(element).offset().left + relativePosition.x,
       pageY: $(element).offset().top + relativePosition.y };
+  }
+
+  function simulateMouseDownWithin(element, relativePosition) {
+    element.trigger(createMouseEvent("mousedown", calcAbsolutePagePosition(relativePosition, element)));
+  }
+
+  function simulateMouseUpWithin(element, relativePosition) {
+    element.trigger(createMouseEvent("mouseup", calcAbsolutePagePosition(relativePosition, element)));
+  }
+
+  function simulateMouseMoveWithin(element, relativePosition) {
+    element.trigger(createMouseEvent("mousemove", calcAbsolutePagePosition(relativePosition, element)));
   }
 
   function createMouseEvent(type, pageLocation) {

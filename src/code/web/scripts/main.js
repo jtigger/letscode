@@ -16,6 +16,7 @@ wwp = {};
     $(containerElementId).mousedown(function(event) {
       startEvent = event;
       var positionWithinCanvas = calcPositionOnPaper(event, paperContainer);
+
       draftLine = wwp.drawLine(positionWithinCanvas, positionWithinCanvas);
       draftLine.attr("stroke-opacity", "0.1");
     });
@@ -26,7 +27,7 @@ wwp = {};
         if (Raphael.type === "SVG") {
           attrs.path[1] = ["L", position.x, position.y];
         } else {
-          attrs.path = attrs.path.substring(0,attrs.path.indexOf("L")+1)+position.x+","+position.y;
+          attrs.path = attrs.path.substring(0, attrs.path.indexOf("L") + 1) + position.x + "," + position.y;
         }
         path.attr(attrs);
       }
@@ -39,12 +40,9 @@ wwp = {};
       }
     });
 
-    $(containerElementId).mouseup(function(event) {
-      var startOffset = calcPositionOnPaper(startEvent, paperContainer);
-      var endOffset = calcPositionOnPaper(event, paperContainer);
-
-      wwp.drawLine(startOffset, endOffset);
-      startEvent = null;
+    $(containerElementId).mouseup(function() {
+      draftLine.attr("stroke-opacity", "1.0");
+      draftLine = null;
     });
 
     return paper;
