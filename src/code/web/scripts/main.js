@@ -35,10 +35,9 @@ wwp = {};
       }
 
       if (draftLine) {
-        var offset = { x: event.pageX - $(containerElementId).offset().left,
-          y: event.pageY - $(containerElementId).offset().top};
+        var positionWithinCanvas = calcPositionOnPaper(event, paperContainer);
 
-        setEndPoint(draftLine, offset);
+        setEndPoint(draftLine, positionWithinCanvas);
       }
     });
 
