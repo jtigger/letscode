@@ -7,18 +7,30 @@ wwp = {};
 
   var paper;
 
+  /**
+   * Installs a Raphael Paper instance into the page and initializes Raphael.
+   *
+   * @param containerElementId the element into which Raphael should initialized (typically a DIV).
+   * @returns {Paper} the initialized instance of Raphael Paper.
+   */
   wwp.initializeDrawingArea = function(containerElementId) {
     var paperContainer = $(containerElementId);
-    var draftLine = null;
 
     paper = new Raphael(containerElementId);
+    registerMouseEventHandlersForDrawingLines(containerElementId, paperContainer);
+    return paper;
+  };
+
+
+  function registerMouseEventHandlersForDrawingLines(containerElementId, paperContainer) {
+    var draftLine = null;
 
     $(containerElementId).mousedown(function(event) {
       var positionWithinCanvas;
 
       if (!draftLine) {
         positionWithinCanvas = calcPositionOnPaper(event, paperContainer);
-        draftLine = wwp.drawLine(positionWithinCanvas, positionWithinCanvas);
+        draftLine = drawLine(positionWithinCanvas, positionWithinCanvas);
         draftLine.attr("stroke-opacity", "0.1");
       }
     });
@@ -33,18 +45,17 @@ wwp = {};
       draftLine.attr("stroke-opacity", "1.0");
       draftLine = null;
     });
-
-    return paper;
-  };
+  }
 
   /**
    * Draws a line on the Paper
    * @param {{x:number, y:number}} start position on the Paper to start the line.
    * @param {{x:number, y:number}} end position on the paper to end the line.
    */
-  wwp.drawLine = function(start, end) {
+   function drawLine(start, end) {
     return paper.path("M" + start.x + "," + start.y + "L" + end.x + "," + end.y);
-  };
+  }
+
 
   /**
    * @param {{pageX: number, pageY:number}} absolutePosition position relative to the document (aka {pageX, pageY}).
