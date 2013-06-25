@@ -72,6 +72,15 @@
         expect(pathOfLine.attr()).to.have.property("path");
       });
 
+      describe("and lets go without moving,", function() {
+        beforeEach(function() {
+          simulateMouseUpWithin(drawingArea, startingPosition);
+        });
+        it("should delete the line.", function() {
+          expect(getElementsOnPaper(paper).length).to.equal(0);
+        });
+      });
+
       describe("and drags to another point within it,", function() {
         var elements;
         var pathOfLine;
@@ -183,6 +192,7 @@
    * @returns { [[],[]] } the value as an array (e.g. [["M", 7, 4], ["L", 19, 42]]).
    */
   function pathAsArray(pathAsString) {
+    // CAP-0003: pathAsArray
     var pathValues;
     if(pathAsString instanceof Array) {
       pathValues = pathAsString;

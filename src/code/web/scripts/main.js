@@ -42,8 +42,17 @@ wwp = {};
     });
 
     $(containerElementId).mouseup(function() {
-      draftLine.attr("stroke-opacity", "1.0");
-      draftLine = null;
+      var path;
+
+      if(draftLine) {
+        path = pathAsArray(draftLine.attr().path);
+        if(path[0][1] === path[1][1] && path[0][2] === path[1][2]) {
+          draftLine.remove();
+        } else {
+          draftLine.attr("stroke-opacity", "1.0");
+        }
+        draftLine = null;
+      }
     });
   }
 
@@ -82,5 +91,24 @@ wwp = {};
     }
     path.attr(attrs);
   }
+
+  /**
+   * Generates an Array representation for a SVG path, handling browser differences.
+   *
+   * @param { [[],[]] | String } pathAsString either the "path" attribute of a Raphael Element that is a Path -OR- a string representing path values.
+   * @returns { [[],[]] } the value as an array (e.g. [["M", 7, 4], ["L", 19, 42]]).
+   */
+  function pathAsArray(pathAsString) {
+    // CAP-0003: pathAsArray
+    var pathValues;
+    if(pathAsString instanceof Array) {
+      pathValues = pathAsString;
+    } else {
+      var pathTokens = pathAsString.match(/([M])(\d+),(\d+)([L])(\d+),(\d+)/);
+      pathValues = [[pathTokens[1], pathTokens[2], pathTokens[3]], [pathTokens[4], pathTokens[5], pathTokens[6]]];
+    }
+    return pathValues;
+  }
+
 
 })();
