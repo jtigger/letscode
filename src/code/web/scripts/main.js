@@ -6,38 +6,26 @@ wwp = {};
   "use strict";
 
   var paper;
-  var startEvent = null;
 
   wwp.initializeDrawingArea = function(containerElementId) {
     var paperContainer = $(containerElementId);
     var draftLine = null;
+
     paper = new Raphael(containerElementId);
 
     $(containerElementId).mousedown(function(event) {
-      startEvent = event;
-      var positionWithinCanvas = calcPositionOnPaper(event, paperContainer);
+      var positionWithinCanvas;
 
       if (!draftLine) {
+        positionWithinCanvas = calcPositionOnPaper(event, paperContainer);
         draftLine = wwp.drawLine(positionWithinCanvas, positionWithinCanvas);
         draftLine.attr("stroke-opacity", "0.1");
       }
     });
 
     $(containerElementId).mousemove(function(event) {
-      function setEndPoint(path, position) {
-        var attrs = path.attr();
-        if (Raphael.type === "SVG") {
-          attrs.path[1] = ["L", position.x, position.y];
-        } else {
-          attrs.path = attrs.path.substring(0, attrs.path.indexOf("L") + 1) + position.x + "," + position.y;
-        }
-        path.attr(attrs);
-      }
-
       if (draftLine) {
-        var positionWithinCanvas = calcPositionOnPaper(event, paperContainer);
-
-        setEndPoint(draftLine, positionWithinCanvas);
+        setEndPoint(draftLine, calcPositionOnPaper(event, paperContainer));
       }
     });
 
@@ -72,6 +60,16 @@ wwp = {};
 
     return { x: absolutePosition.pageX - positionOfContainerOnPage.x - leftPadding,
       y: absolutePosition.pageY - positionOfContainerOnPage.y - topPadding };
+  }
+
+  function setEndPoint(path, position) {
+    var attrs = path.attr();
+    if (Raphael.type === "SVG") {
+      attrs.path[1] = ["L", position.x, position.y];
+    } else {
+      attrs.path = attrs.path.substring(0, attrs.path.indexOf("L") + 1) + position.x + "," + position.y;
+    }
+    path.attr(attrs);
   }
 
 })();
