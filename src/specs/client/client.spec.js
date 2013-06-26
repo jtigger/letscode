@@ -138,15 +138,15 @@
           });
         });
 
-        describe("and drags outside of the canvas, and lets go, and clicks back in it", function() {
+        describe("and drags outside of the canvas, and lets go", function() {
           beforeEach(function() {
             // this assumes that the "mousemove" and "mouseup" events have no affect on WWP's behavior, here.
-            simulateMouseDownWithRespectTo(drawingArea, endingPosition);
+            simulateMouseLeaveWithRespectTo(drawingArea);
             elements = getElementsOnPaper(paper);
           });
 
-          it("should continue to adjust the same line (and not create a new one)", function() {
-             expect(elements.length).to.be(1);
+          it("should abort drawing the line", function() {
+             expect(elements.length).to.be(0);
           });
         });
 
@@ -217,6 +217,10 @@
     element.trigger(createMouseEvent("mousemove", calcAbsolutePagePosition(relativePosition, element)));
   }
 
+  function simulateMouseLeaveWithRespectTo(element) {
+    element.trigger(createMouseEvent("mouseleave"));
+  }
+
   /**
    * @param {{x: number, y:number}} relativePosition
    * @param element jQuery selector of the element to which relativePosition is relative.
@@ -227,12 +231,18 @@
       pageY: $(element).offset().top + relativePosition.y };
   }
 
-
+  /**
+   * @param type which event to create.
+   * @param {{pageX:number, pageY:number}} [pageLocation]
+   * @returns {Event}
+   */
   function createMouseEvent(type, pageLocation) {
     var event = jQuery.Event();
     event.type = type;
-    event.pageX = pageLocation.pageX;
-    event.pageY = pageLocation.pageY;
+    if(pageLocation) {
+      event.pageX = pageLocation.pageX;
+      event.pageY = pageLocation.pageY;
+    }
     return event;
   }
 

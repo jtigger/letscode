@@ -56,6 +56,14 @@ wwp = {};
         draftLine = null;
       }
     });
+
+    $(containerElementId).mouseleave(function() {
+      if(draftLine) {
+        draftLine.remove();
+        draftLine = null;
+      }
+    });
+
   }
 
   /**
