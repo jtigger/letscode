@@ -57,12 +57,36 @@
       expect(paper.width).to.be(400);
     });
 
+    it("should account for padding of the canvas' container when determining the location of a line.", function() {
+      var topPadding = 10;
+      var leftPadding = 20;
+      var mousePath = [
+        ['M', 100, 10],
+        ['L', 20, 200]
+      ];
+      var expectedPath = [
+        ['M', mousePath[0][1] - leftPadding, mousePath[0][2] - topPadding],
+        ['L', mousePath[1][1] - leftPadding, mousePath[1][2] - topPadding]
+      ];
+
+      drawingArea.attr("style", function(index, value) {
+        return value + "; padding-left: " + leftPadding + "px; padding-top: " + topPadding + "px";
+      });
+
+      simulateMouseDownWithRespectTo(drawingArea, {x: mousePath[0][1], y: mousePath[0][2]});
+      simulateMouseMoveWithRespectTo(drawingArea, {x: mousePath[1][1], y: mousePath[1][2]});
+      simulateMouseUpWithRespectTo(drawingArea, {x: mousePath[1][1], y: mousePath[1][2]});
+
+      var path = getElementsOnPaper(paper)[0];
+      expect(pathAsString(path.attr().path)).to.be(pathAsString(expectedPath));
+    });
+
     describe("when the user clicks within it,", function() {
       var startingPosition = {x: 100, y: 10};
       var endingPosition = {x: 200, y: 20};
 
       beforeEach(function() {
-        simulateMouseDownWithin(drawingArea, startingPosition);
+        simulateMouseDownWithRespectTo(drawingArea, startingPosition);
       });
 
       it("should draw a line.", function() {
@@ -74,7 +98,7 @@
 
       describe("and lets go without moving,", function() {
         beforeEach(function() {
-          simulateMouseUpWithin(drawingArea, startingPosition);
+          simulateMouseUpWithRespectTo(drawingArea, startingPosition);
         });
         it("should delete the line.", function() {
           expect(getElementsOnPaper(paper).length).to.equal(0);
@@ -86,7 +110,7 @@
         var pathOfLine;
 
         beforeEach(function() {
-          simulateMouseMoveWithin(drawingArea, endingPosition);
+          simulateMouseMoveWithRespectTo(drawingArea, endingPosition);
           elements = getElementsOnPaper(paper);
           pathOfLine = elements[0];
         });
@@ -106,7 +130,7 @@
 
         describe("and lets go,", function() {
           beforeEach(function() {
-            simulateMouseUpWithin(drawingArea, endingPosition);
+            simulateMouseUpWithRespectTo(drawingArea, endingPosition);
           });
 
           it("should make the line fully opaque.", function() {
@@ -117,7 +141,7 @@
         describe("and drags outside of the canvas, and lets go, and clicks back in it", function() {
           beforeEach(function() {
             // this assumes that the "mousemove" and "mouseup" events have no affect on WWP's behavior, here.
-            simulateMouseDownWithin(drawingArea, endingPosition);
+            simulateMouseDownWithRespectTo(drawingArea, endingPosition);
             elements = getElementsOnPaper(paper);
           });
 
@@ -130,29 +154,6 @@
 
     });
 
-    it("when determining the location of a line, WWP accounts for padding of the canvas' container.", function() {
-      var topPadding = 10;
-      var leftPadding = 20;
-      var mousePath = [
-        ['M', 100, 10],
-        ['L', 20, 200]
-      ];
-      var expectedPath = [
-        ['M', mousePath[0][1] - leftPadding, mousePath[0][2] - topPadding],
-        ['L', mousePath[1][1] - leftPadding, mousePath[1][2] - topPadding]
-      ];
-
-      drawingArea.attr("style", function(index, value) {
-        return value + "; padding-left: " + leftPadding + "px; padding-top: " + topPadding + "px";
-      });
-
-      simulateMouseDownWithin(drawingArea, {x: mousePath[0][1], y: mousePath[0][2]});
-      simulateMouseMoveWithin(drawingArea, {x: mousePath[1][1], y: mousePath[1][2]});
-      simulateMouseUpWithin(drawingArea, {x: mousePath[1][1], y: mousePath[1][2]});
-
-      var path = getElementsOnPaper(paper)[0];
-      expect(pathAsString(path.attr().path)).to.be(pathAsString(expectedPath));
-    });
 
   });
 
@@ -203,15 +204,16 @@
     return pathValues;
   }
 
-  function simulateMouseDownWithin(element, relativePosition) {
-    element.trigger(createMouseEvent("mousedown", calcAbsolutePagePosition(relativePosition, element)));
+  function simulateMouseDownWithRespectTo(element, relativePosition) {
+    var pagePosition = calcAbsolutePagePosition(relativePosition, element);
+    element.trigger(createMouseEvent("mousedown", pagePosition));
   }
 
-  function simulateMouseUpWithin(element, relativePosition) {
+  function simulateMouseUpWithRespectTo(element, relativePosition) {
     element.trigger(createMouseEvent("mouseup", calcAbsolutePagePosition(relativePosition, element)));
   }
 
-  function simulateMouseMoveWithin(element, relativePosition) {
+  function simulateMouseMoveWithRespectTo(element, relativePosition) {
     element.trigger(createMouseEvent("mousemove", calcAbsolutePagePosition(relativePosition, element)));
   }
 
