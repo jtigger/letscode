@@ -33,6 +33,7 @@ wwp = {};
         draftLine = drawLine(positionWithinCanvas, positionWithinCanvas);
         draftLine.attr("stroke-opacity", "0.1");
       }
+      return false;
     });
 
     $(containerElementId).mousemove(function(event) {

@@ -138,23 +138,30 @@
           });
         });
 
-        describe("and drags outside of the canvas, and lets go", function() {
+        describe("and drags outside of the canvas", function() {
           beforeEach(function() {
-            // this assumes that the "mousemove" and "mouseup" events have no affect on WWP's behavior, here.
             simulateMouseLeaveWithRespectTo(drawingArea);
             elements = getElementsOnPaper(paper);
           });
 
           it("should abort drawing the line", function() {
-             expect(elements.length).to.be(0);
+            expect(elements.length).to.be(0);
+          });
+
+          it("should prevent other elements outside the canvas from being selected.", function() {
+            var positionOutsideTheDrawingArea = {x: drawingArea.outerWidth() + 10, y:drawingArea.outerHeight() + 10 };
+            // I don't know how to detect if other elements are selected.
+            // However, selecting other elements is the default browser behavior.
+            // So, by checking to make sure we disable default behavior, we are verifying that other elements
+            // aren't being selected.
+            drawingArea.mousedown(function(event) {
+              expect(event.isDefaultPrevented()).to.be(true);
+            });
+            simulateMouseDownWithRespectTo(drawingArea, positionOutsideTheDrawingArea);
           });
         });
-
       });
-
     });
-
-
   });
 
   function getElementsOnPaper(paper) {
@@ -195,11 +202,14 @@
   function pathAsArray(pathAsString) {
     // CAP-0003: pathAsArray
     var pathValues;
-    if(pathAsString instanceof Array) {
+    if (pathAsString instanceof Array) {
       pathValues = pathAsString;
     } else {
       var pathTokens = pathAsString.match(/([M])(\d+),(\d+)([L])(\d+),(\d+)/);
-      pathValues = [[pathTokens[1], pathTokens[2], pathTokens[3]], [pathTokens[4], pathTokens[5], pathTokens[6]]];
+      pathValues = [
+        [pathTokens[1], pathTokens[2], pathTokens[3]],
+        [pathTokens[4], pathTokens[5], pathTokens[6]]
+      ];
     }
     return pathValues;
   }
@@ -239,7 +249,7 @@
   function createMouseEvent(type, pageLocation) {
     var event = jQuery.Event();
     event.type = type;
-    if(pageLocation) {
+    if (pageLocation) {
       event.pageX = pageLocation.pageX;
       event.pageY = pageLocation.pageY;
     }
