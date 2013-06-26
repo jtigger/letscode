@@ -57,21 +57,28 @@
       expect(paper.width).to.be(400);
     });
 
-    it("when told to draw a line, should add a 'path' to the canvas.", function() {
-      var pathValues = [
-        ['M', 200, 30],
-        ['L', 200, 20]
+    it("should account for padding of the canvas' container when determining the location of a line.", function() {
+      var topPadding = 10;
+      var leftPadding = 20;
+      var mousePath = [
+        ['M', 100, 10],
+        ['L', 20, 200]
       ];
-      var elements, element;
+      var expectedPath = [
+        ['M', mousePath[0][1] - leftPadding, mousePath[0][2] - topPadding],
+        ['L', mousePath[1][1] - leftPadding, mousePath[1][2] - topPadding]
+      ];
 
-      wwp.drawLine({x: pathValues[0][1], y: pathValues[0][2]}, {x: pathValues[1][1], y: pathValues[1][2]});
+      drawingArea.attr("style", function(index, value) {
+        return value + "; padding-left: " + leftPadding + "px; padding-top: " + topPadding + "px";
+      });
 
-      elements = getElementsOnPaper(paper);
-      expect(elements.length).to.equal(1);
-      element = elements[0];
+      simulateMouseDownWithRespectTo(drawingArea, {x: mousePath[0][1], y: mousePath[0][2]});
+      simulateMouseMoveWithRespectTo(drawingArea, {x: mousePath[1][1], y: mousePath[1][2]});
+      simulateMouseUpWithRespectTo(drawingArea, {x: mousePath[1][1], y: mousePath[1][2]});
 
-      expect(element.attr()).to.have.property("path");
-      expect(pathAsString(element.attr().path)).to.equal(pathAsString(pathValues));
+      var path = getElementsOnPaper(paper)[0];
+      expect(pathAsString(path.attr().path)).to.be(pathAsString(expectedPath));
     });
 
     describe("when the user clicks within it,", function() {
@@ -79,7 +86,7 @@
       var endingPosition = {x: 200, y: 20};
 
       beforeEach(function() {
-        simulateMouseDownWithin(drawingArea, startingPosition);
+        simulateMouseDownWithRespectTo(drawingArea, startingPosition);
       });
 
       it("should draw a line.", function() {
@@ -89,12 +96,21 @@
         expect(pathOfLine.attr()).to.have.property("path");
       });
 
+      describe("and lets go without moving,", function() {
+        beforeEach(function() {
+          simulateMouseUpWithRespectTo(drawingArea, startingPosition);
+        });
+        it("should delete the line.", function() {
+          expect(getElementsOnPaper(paper).length).to.equal(0);
+        });
+      });
+
       describe("and drags to another point within it,", function() {
         var elements;
         var pathOfLine;
 
         beforeEach(function() {
-          simulateMouseMoveWithin(drawingArea, endingPosition);
+          simulateMouseMoveWithRespectTo(drawingArea, endingPosition);
           elements = getElementsOnPaper(paper);
           pathOfLine = elements[0];
         });
@@ -114,7 +130,7 @@
 
         describe("and lets go,", function() {
           beforeEach(function() {
-            simulateMouseUpWithin(drawingArea, endingPosition);
+            simulateMouseUpWithRespectTo(drawingArea, endingPosition);
           });
 
           it("should make the line fully opaque.", function() {
@@ -122,57 +138,41 @@
           });
         });
 
-        describe("and drags outside of the canvas, and lets go, and clicks back in it", function() {
+        describe("and drags outside of the canvas", function() {
           beforeEach(function() {
-            // this assumes that the "mousemove" and "mouseup" events have no affect on WWP's behavior, here.
-            simulateMouseDownWithin(drawingArea, endingPosition);
+            simulateMouseLeaveWithRespectTo(drawingArea);
             elements = getElementsOnPaper(paper);
           });
 
-          it("should continue to adjust the same line (and not create a new one)", function() {
-             expect(elements.length).to.be(1);
+          it("should abort drawing the line", function() {
+            expect(elements.length).to.be(0);
+          });
+
+          it("should prevent other elements outside the canvas from being selected (even on IE 8).", function() {
+            var positionOutsideTheDrawingArea = {x: drawingArea.outerWidth() + 10, y:drawingArea.outerHeight() + 10 };
+            drawingArea.mousedown(function(event) {
+              expect(event.isDefaultPrevented()).to.be(true);
+            });
+            simulateMouseDownWithRespectTo(drawingArea, positionOutsideTheDrawingArea);
+
+            // this is additionally required by IE 8.0
+            drawingArea.on("selectstart", function(event) {
+              expect(event.isDefaultPrevented()).to.be(true);
+            });
+            simulateMouseEventOn("selectstart", drawingArea, positionOutsideTheDrawingArea);
           });
         });
-
       });
-
     });
-
-    it("when user clicks, drags, and lets go, draws a line that starts where they clicked and ends where they had let go.", function() {
-//      var expectedPathValues = [
-//        ['M', 100, 200],
-//        ['L', 150, 250]
-//      ];
-//      clickAndDragAcrossPath(expectedPathValues, drawingArea);
-//
-//      var path = getElementsOnPaper(paper)[0];
-//
-//      expect(pathAsString(path.attr().path)).to.equal(pathAsString(expectedPathValues));
-    });
-
-    it("when determining the location of a line, WWP accounts for padding of the canvas' container.", function() {
-//      var topPadding = 11;
-//      var leftPadding = 19;
-//      var mousePath = [
-//        ['M', 101, 223],
-//        ['L', 113, 251]
-//      ];
-//      var expectedPath = [
-//        ['M', mousePath[0][1] - leftPadding, mousePath[0][2] - topPadding],
-//        ['L', mousePath[1][1] - leftPadding, mousePath[1][2] - topPadding]
-//      ];
-//
-//      drawingArea.attr("style", function(index, value) {
-//        return value + "; padding-left: " + leftPadding + "px; padding-top: " + topPadding + "px";
-//      });
-//
-//      clickAndDragAcrossPath(mousePath, drawingArea);
-//
-//      var path = getElementsOnPaper(paper)[0];
-//      expect(pathAsString(path.attr().path)).to.be(pathAsString(expectedPath));
-    });
-
   });
+
+  function getElementsOnPaper(paper) {
+    var elements = [];
+    paper.forEach(function(element) {
+      elements.push(element);
+    });
+    return elements;
+  }
 
   /**
    * Generates String representation for a SVG Path, handling browser differences.
@@ -202,33 +202,38 @@
    * @returns { [[],[]] } the value as an array (e.g. [["M", 7, 4], ["L", 19, 42]]).
    */
   function pathAsArray(pathAsString) {
+    // CAP-0003: pathAsArray
     var pathValues;
-    if(pathAsString instanceof Array) {
+    if (pathAsString instanceof Array) {
       pathValues = pathAsString;
     } else {
       var pathTokens = pathAsString.match(/([M])(\d+),(\d+)([L])(\d+),(\d+)/);
-      pathValues = [[pathTokens[1], pathTokens[2], pathTokens[3]], [pathTokens[4], pathTokens[5], pathTokens[6]]];
+      pathValues = [
+        [pathTokens[1], pathTokens[2], pathTokens[3]],
+        [pathTokens[4], pathTokens[5], pathTokens[6]]
+      ];
     }
     return pathValues;
   }
 
+  function simulateMouseEventOn(eventType, element, pagePosition) {
+    element.trigger(createMouseEvent(eventType, pagePosition));
+  }
+  function simulateMouseDownWithRespectTo(element, relativePosition) {
+    simulateMouseEventOn("mousedown", element, calcAbsolutePagePosition(relativePosition, element));
+  }
 
-  /**
-   * Generates and dispatches browser events that simulates a user clicking on the starting position of the path
-   * and letting go at the ending position of the path.
-   *
-   * @param pathValues [['M', AAA, BBB], ['L', XXX, YYY]]
-   * @param drawingArea the HTML element containing the Raphael Paper (typically a DIV).
-   */
-  /*
-   function clickAndDragAcrossPath(pathValues, drawingArea) {
-   // TODO: emit "mousemove" events along the paths.
-   var startingPosition = calcAbsolutePagePosition({x: pathValues[0][1], y: pathValues[0][2]}, drawingArea);
-   var endingPosition = calcAbsolutePagePosition({x: pathValues[1][1], y: pathValues[1][2]}, drawingArea);
-   drawingArea.trigger(createMouseEvent("mousedown", startingPosition));
-   drawingArea.trigger(createMouseEvent("mouseup", endingPosition));
-   }
-   */
+  function simulateMouseUpWithRespectTo(element, relativePosition) {
+    simulateMouseEventOn("mouseup", element, calcAbsolutePagePosition(relativePosition, element));
+  }
+
+  function simulateMouseMoveWithRespectTo(element, relativePosition) {
+    simulateMouseEventOn("mousemove", element, calcAbsolutePagePosition(relativePosition, element));
+  }
+
+  function simulateMouseLeaveWithRespectTo(element) {
+    element.trigger(createMouseEvent("mouseleave"));
+  }
 
   /**
    * @param {{x: number, y:number}} relativePosition
@@ -240,32 +245,19 @@
       pageY: $(element).offset().top + relativePosition.y };
   }
 
-  function simulateMouseDownWithin(element, relativePosition) {
-    element.trigger(createMouseEvent("mousedown", calcAbsolutePagePosition(relativePosition, element)));
-  }
-
-  function simulateMouseUpWithin(element, relativePosition) {
-    element.trigger(createMouseEvent("mouseup", calcAbsolutePagePosition(relativePosition, element)));
-  }
-
-  function simulateMouseMoveWithin(element, relativePosition) {
-    element.trigger(createMouseEvent("mousemove", calcAbsolutePagePosition(relativePosition, element)));
-  }
-
+  /**
+   * @param type which event to create.
+   * @param {{pageX:number, pageY:number}} [pageLocation]
+   * @returns {Event}
+   */
   function createMouseEvent(type, pageLocation) {
     var event = jQuery.Event();
     event.type = type;
-    event.pageX = pageLocation.pageX;
-    event.pageY = pageLocation.pageY;
+    if (pageLocation) {
+      event.pageX = pageLocation.pageX;
+      event.pageY = pageLocation.pageY;
+    }
     return event;
-  }
-
-  function getElementsOnPaper(paper) {
-    var elements = [];
-    paper.forEach(function(element) {
-      elements.push(element);
-    });
-    return elements;
   }
 
 })();

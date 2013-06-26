@@ -6,58 +6,86 @@ wwp = {};
   "use strict";
 
   var paper;
-  var startEvent = null;
 
+  /**
+   * Installs a Raphael Paper instance into the page and initializes Raphael.
+   *
+   * @param containerElementId the element into which Raphael should initialized (typically a DIV).
+   * @returns {Paper} the initialized instance of Raphael Paper.
+   */
   wwp.initializeDrawingArea = function(containerElementId) {
     var paperContainer = $(containerElementId);
-    var draftLine = null;
+
     paper = new Raphael(containerElementId);
+    registerMouseEventHandlersForDrawingLines(containerElementId, paperContainer);
+    paperContainer.onselectstart = function() {
+      return false;
+    };
+    return paper;
+  };
+
+  function registerMouseEventHandlersForDrawingLines(containerElementId, paperContainer) {
+    var draftLine = null;
 
     $(containerElementId).mousedown(function(event) {
-      startEvent = event;
-      var positionWithinCanvas = calcPositionOnPaper(event, paperContainer);
+      var positionWithinCanvas;
 
       if (!draftLine) {
-        draftLine = wwp.drawLine(positionWithinCanvas, positionWithinCanvas);
+        positionWithinCanvas = calcPositionOnPaper(event, paperContainer);
+        draftLine = drawLine(positionWithinCanvas, positionWithinCanvas);
         draftLine.attr("stroke-opacity", "0.1");
       }
+      event.preventDefault();  // to avoid user selecting elements off the Paper.
     });
 
+    // In all other browsers, preventing the default browser behavior on "mousedown" events is sufficient to
+    // prevent the user from inadvertently selecting elements outside of Paper.
+    // IE 8.0's event model is different.  That behavior is covered by the "selectstart" event.
+    $(containerElementId).on("selectstart", function(event) {
+      event.preventDefault();
+    });
+
+
     $(containerElementId).mousemove(function(event) {
-      function setEndPoint(path, position) {
-        var attrs = path.attr();
-        if (Raphael.type === "SVG") {
-          attrs.path[1] = ["L", position.x, position.y];
-        } else {
-          attrs.path = attrs.path.substring(0, attrs.path.indexOf("L") + 1) + position.x + "," + position.y;
-        }
-        path.attr(attrs);
-      }
-
       if (draftLine) {
-        var offset = { x: event.pageX - $(containerElementId).offset().left,
-          y: event.pageY - $(containerElementId).offset().top};
-
-        setEndPoint(draftLine, offset);
+        setEndPoint(draftLine, calcPositionOnPaper(event, paperContainer));
       }
     });
 
     $(containerElementId).mouseup(function() {
-      draftLine.attr("stroke-opacity", "1.0");
-      draftLine = null;
+      var path;
+      var startingPointEqualsEndingPoint;
+
+      if (draftLine) {
+        path = pathAsArray(draftLine.attr().path);
+        startingPointEqualsEndingPoint = path[0][1] === path[1][1] && path[0][2] === path[1][2];
+        if (startingPointEqualsEndingPoint) {
+          draftLine.remove();
+        } else {
+          draftLine.attr("stroke-opacity", "1.0");
+        }
+        draftLine = null;
+      }
     });
 
-    return paper;
-  };
+    $(containerElementId).mouseleave(function() {
+      if (draftLine) {
+        draftLine.remove();
+        draftLine = null;
+      }
+    });
+
+
+  }
 
   /**
    * Draws a line on the Paper
    * @param {{x:number, y:number}} start position on the Paper to start the line.
    * @param {{x:number, y:number}} end position on the paper to end the line.
    */
-  wwp.drawLine = function(start, end) {
+  function drawLine(start, end) {
     return paper.path("M" + start.x + "," + start.y + "L" + end.x + "," + end.y);
-  };
+  }
 
   /**
    * @param {{pageX: number, pageY:number}} absolutePosition position relative to the document (aka {pageX, pageY}).
@@ -73,6 +101,37 @@ wwp = {};
 
     return { x: absolutePosition.pageX - positionOfContainerOnPage.x - leftPadding,
       y: absolutePosition.pageY - positionOfContainerOnPage.y - topPadding };
+  }
+
+  function setEndPoint(path, position) {
+    var attrs = path.attr();
+    if (Raphael.type === "SVG") {
+      attrs.path[1] = ["L", position.x, position.y];
+    } else {
+      attrs.path = attrs.path.substring(0, attrs.path.indexOf("L") + 1) + position.x + "," + position.y;
+    }
+    path.attr(attrs);
+  }
+
+  /**
+   * Generates an Array representation for a SVG path, handling browser differences.
+   *
+   * @param { [[],[]] | String } pathAsString either the "path" attribute of a Raphael Element that is a Path -OR- a string representing path values.
+   * @returns { [[],[]] } the value as an array (e.g. [["M", 7, 4], ["L", 19, 42]]).
+   */
+  function pathAsArray(pathAsString) {
+    // CAP-0003: pathAsArray
+    var pathValues;
+    if (pathAsString instanceof Array) {
+      pathValues = pathAsString;
+    } else {
+      var pathTokens = pathAsString.match(/([M])(\d+),(\d+)([L])(\d+),(\d+)/);
+      pathValues = [
+        [pathTokens[1], pathTokens[2], pathTokens[3]],
+        [pathTokens[4], pathTokens[5], pathTokens[6]]
+      ];
+    }
+    return pathValues;
   }
 
 })();
