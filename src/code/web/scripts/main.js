@@ -43,10 +43,12 @@ wwp = {};
 
     $(containerElementId).mouseup(function() {
       var path;
+      var startingPointEqualsEndingPoint;
 
       if(draftLine) {
         path = pathAsArray(draftLine.attr().path);
-        if(path[0][1] === path[1][1] && path[0][2] === path[1][2]) {
+        startingPointEqualsEndingPoint = path[0][1] === path[1][1] && path[0][2] === path[1][2];
+        if(startingPointEqualsEndingPoint) {
           draftLine.remove();
         } else {
           draftLine.attr("stroke-opacity", "1.0");

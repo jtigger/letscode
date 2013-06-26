@@ -203,16 +203,6 @@
     return pathValues;
   }
 
-  /**
-   * @param {{x: number, y:number}} relativePosition
-   * @param element jQuery selector of the element to which relativePosition is relative.
-   * @returns {{pageX: number, pageY: number}} the corresponding position relative to the document.
-   */
-  function calcAbsolutePagePosition(relativePosition, element) {
-    return  { pageX: $(element).offset().left + relativePosition.x,
-      pageY: $(element).offset().top + relativePosition.y };
-  }
-
   function simulateMouseDownWithin(element, relativePosition) {
     element.trigger(createMouseEvent("mousedown", calcAbsolutePagePosition(relativePosition, element)));
   }
@@ -224,6 +214,17 @@
   function simulateMouseMoveWithin(element, relativePosition) {
     element.trigger(createMouseEvent("mousemove", calcAbsolutePagePosition(relativePosition, element)));
   }
+
+  /**
+   * @param {{x: number, y:number}} relativePosition
+   * @param element jQuery selector of the element to which relativePosition is relative.
+   * @returns {{pageX: number, pageY: number}} the corresponding position relative to the document.
+   */
+  function calcAbsolutePagePosition(relativePosition, element) {
+    return  { pageX: $(element).offset().left + relativePosition.x,
+      pageY: $(element).offset().top + relativePosition.y };
+  }
+
 
   function createMouseEvent(type, pageLocation) {
     var event = jQuery.Event();
