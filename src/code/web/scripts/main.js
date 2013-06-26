@@ -18,9 +18,11 @@ wwp = {};
 
     paper = new Raphael(containerElementId);
     registerMouseEventHandlersForDrawingLines(containerElementId, paperContainer);
+    paperContainer.onselectstart = function() {
+      return false;
+    };
     return paper;
   };
-
 
   function registerMouseEventHandlersForDrawingLines(containerElementId, paperContainer) {
     var draftLine = null;
@@ -33,8 +35,16 @@ wwp = {};
         draftLine = drawLine(positionWithinCanvas, positionWithinCanvas);
         draftLine.attr("stroke-opacity", "0.1");
       }
-      return false;
+      event.preventDefault();  // to avoid user selecting elements off the Paper.
     });
+
+    // In all other browsers, preventing the default browser behavior on "mousedown" events is sufficient to
+    // prevent the user from inadvertently selecting elements outside of Paper.
+    // IE 8.0's event model is different.  That behavior is covered by the "selectstart" event.
+    $(containerElementId).on("selectstart", function(event) {
+      event.preventDefault();
+    });
+
 
     $(containerElementId).mousemove(function(event) {
       if (draftLine) {
@@ -46,10 +56,10 @@ wwp = {};
       var path;
       var startingPointEqualsEndingPoint;
 
-      if(draftLine) {
+      if (draftLine) {
         path = pathAsArray(draftLine.attr().path);
         startingPointEqualsEndingPoint = path[0][1] === path[1][1] && path[0][2] === path[1][2];
-        if(startingPointEqualsEndingPoint) {
+        if (startingPointEqualsEndingPoint) {
           draftLine.remove();
         } else {
           draftLine.attr("stroke-opacity", "1.0");
@@ -59,11 +69,12 @@ wwp = {};
     });
 
     $(containerElementId).mouseleave(function() {
-      if(draftLine) {
+      if (draftLine) {
         draftLine.remove();
         draftLine = null;
       }
     });
+
 
   }
 
@@ -72,10 +83,9 @@ wwp = {};
    * @param {{x:number, y:number}} start position on the Paper to start the line.
    * @param {{x:number, y:number}} end position on the paper to end the line.
    */
-   function drawLine(start, end) {
+  function drawLine(start, end) {
     return paper.path("M" + start.x + "," + start.y + "L" + end.x + "," + end.y);
   }
-
 
   /**
    * @param {{pageX: number, pageY:number}} absolutePosition position relative to the document (aka {pageX, pageY}).
@@ -112,14 +122,16 @@ wwp = {};
   function pathAsArray(pathAsString) {
     // CAP-0003: pathAsArray
     var pathValues;
-    if(pathAsString instanceof Array) {
+    if (pathAsString instanceof Array) {
       pathValues = pathAsString;
     } else {
       var pathTokens = pathAsString.match(/([M])(\d+),(\d+)([L])(\d+),(\d+)/);
-      pathValues = [[pathTokens[1], pathTokens[2], pathTokens[3]], [pathTokens[4], pathTokens[5], pathTokens[6]]];
+      pathValues = [
+        [pathTokens[1], pathTokens[2], pathTokens[3]],
+        [pathTokens[4], pathTokens[5], pathTokens[6]]
+      ];
     }
     return pathValues;
   }
-
 
 })();

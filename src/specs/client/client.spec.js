@@ -148,16 +148,18 @@
             expect(elements.length).to.be(0);
           });
 
-          it("should prevent other elements outside the canvas from being selected.", function() {
+          it("should prevent other elements outside the canvas from being selected (even on IE 8).", function() {
             var positionOutsideTheDrawingArea = {x: drawingArea.outerWidth() + 10, y:drawingArea.outerHeight() + 10 };
-            // I don't know how to detect if other elements are selected.
-            // However, selecting other elements is the default browser behavior.
-            // So, by checking to make sure we disable default behavior, we are verifying that other elements
-            // aren't being selected.
             drawingArea.mousedown(function(event) {
               expect(event.isDefaultPrevented()).to.be(true);
             });
             simulateMouseDownWithRespectTo(drawingArea, positionOutsideTheDrawingArea);
+
+            // this is additionally required by IE 8.0
+            drawingArea.on("selectstart", function(event) {
+              expect(event.isDefaultPrevented()).to.be(true);
+            });
+            simulateMouseEventOn("selectstart", drawingArea, positionOutsideTheDrawingArea);
           });
         });
       });
@@ -214,17 +216,19 @@
     return pathValues;
   }
 
+  function simulateMouseEventOn(eventType, element, pagePosition) {
+    element.trigger(createMouseEvent(eventType, pagePosition));
+  }
   function simulateMouseDownWithRespectTo(element, relativePosition) {
-    var pagePosition = calcAbsolutePagePosition(relativePosition, element);
-    element.trigger(createMouseEvent("mousedown", pagePosition));
+    simulateMouseEventOn("mousedown", element, calcAbsolutePagePosition(relativePosition, element));
   }
 
   function simulateMouseUpWithRespectTo(element, relativePosition) {
-    element.trigger(createMouseEvent("mouseup", calcAbsolutePagePosition(relativePosition, element)));
+    simulateMouseEventOn("mouseup", element, calcAbsolutePagePosition(relativePosition, element));
   }
 
   function simulateMouseMoveWithRespectTo(element, relativePosition) {
-    element.trigger(createMouseEvent("mousemove", calcAbsolutePagePosition(relativePosition, element)));
+    simulateMouseEventOn("mousemove", element, calcAbsolutePagePosition(relativePosition, element));
   }
 
   function simulateMouseLeaveWithRespectTo(element) {
