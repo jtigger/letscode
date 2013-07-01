@@ -1,0 +1,24 @@
+<html>
+<head>
+    <title>WeeWikiPaint</title>
+    <!-- pageId=Home -->
+    <script src="scripts/lib/jquery-1.10.1.js"></script>
+    <script src="scripts/lib/raphael-min-2.1.0.js"></script>
+    <script src="scripts/main.js"></script>
+</head>
+<body>
+<h1>Welcome!</h1>
+<p>Welcome to the future of collaborative drawing!</p>
+<p>With WeeWikiPaint, you will be able to express your visual self with others in a real-time environment.</p>
+<div id="eventInfoBox" style="width:60%; border: solid blue 3px; float: left;">
+    <p>Event Information:</p>
+    <div id="eventInfo"></div>
+</div>
+<div id="canvas" style="height: 600px; width: 35%; border: solid black 2px; float: right;"></div>
+<script type="text/javascript">
+    $(function() {
+      wwp.initializeDrawingArea($("#canvas")[0]);
+    });
+</script>
+</body>
+</html>
