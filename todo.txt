@@ -9,6 +9,7 @@ Minimum Marketable Feature:
 - collaborative painting wiki
 
 User Stories:
+[ ] Spike how iTouch events work.
 [ ] "Draw a Line" (via touch)
 [ ] "Draw multiple lines"
 [ ] "Abort line-draw" (when user hits Esc)
