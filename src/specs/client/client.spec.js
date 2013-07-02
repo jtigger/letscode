@@ -81,57 +81,6 @@
       expect(pathAsString(path.attr().path)).to.be(pathAsString(expectedPath));
     });
 
-    if (browserDoesSupportTouchEvents()) {
-      describe("when the user touches within it", function() {
-
-        var startingPosition = {x: 100, y: 10};
-//      var endingPosition = {x: 200, y: 20};
-
-        function createTouchEvent(type, pageLocation) {
-          var event;
-
-          event = jQuery.Event();
-          event.type = type;
-          event.originalEvent = document.createEvent("TouchEvent");
-          event.originalEvent.initTouchEvent(event, true, true);
-          if (pageLocation) {
-            event.pageX = pageLocation.pageX;
-            event.pageY = pageLocation.pageY;
-          }
-          return event;
-        }
-
-        function simulateTouchStartWithRespectTo(element, relativePosition) {
-          element.trigger(createTouchEvent("touchstart", calcAbsolutePagePosition(relativePosition, element)));
-        }
-
-        function simulateTouchEndWithRespectTo(element, relativePosition) {
-          element.trigger(createTouchEvent("touchend", calcAbsolutePagePosition(relativePosition, element)));
-        }
-
-        beforeEach(function() {
-          simulateTouchStartWithRespectTo(drawingArea, startingPosition);
-        });
-
-        it("should draw a line.", function() {
-          var elements = getElementsOnPaper(paper);
-          var pathOfLine = elements[0];
-          expect(elements.length).to.equal(1);
-          expect(pathOfLine.attr()).to.have.property("path");
-        });
-
-        describe("and lets go without moving,", function() {
-          beforeEach(function() {
-            simulateTouchEndWithRespectTo(drawingArea, startingPosition);
-          });
-          it("should delete the line.", function() {
-            expect(getElementsOnPaper(paper).length).to.equal(0);
-          });
-        });
-
-      });
-    }
-
     describe("when the user clicks within it,", function() {
       var startingPosition = {x: 100, y: 10};
       var endingPosition = {x: 200, y: 20};
@@ -215,6 +164,84 @@
         });
       });
     });
+
+    if (browserDoesSupportTouchEvents()) {
+      // the behavior with touch mirrors that of the mouse unless otherwise specified, below.
+      describe("when the user touches within it", function() {
+
+        var startingPosition = {x: 100, y: 10};
+        var endingPosition = {x: 200, y: 20};
+        var secondTouchPosition = {x: 10, y: 10};
+
+        function createTouchEvent(type, pageLocation) {
+          var event;
+
+          event = jQuery.Event();
+          event.type = type;
+          event.originalEvent = document.createEvent("TouchEvent");
+          event.originalEvent.initTouchEvent(event, true, true);
+          if (pageLocation) {
+            event.pageX = pageLocation.pageX;
+            event.pageY = pageLocation.pageY;
+          }
+          return event;
+        }
+
+        function simulateTouchStartWithRespectTo(element, relativePosition) {
+          element.trigger(createTouchEvent("touchstart", calcAbsolutePagePosition(relativePosition, element)));
+        }
+
+        // TODO: document multi-touch handling
+        function simulateTouchMoveWithRespectTo(element, relativePosition) {
+          var pagePosition;
+
+          if(relativePosition instanceof Array) {
+            // multi-touch
+            pagePosition = relativePosition.map(function(item) {
+              return calcAbsolutePagePosition(item, element);
+            });
+          } else {
+            pagePosition = calcAbsolutePagePosition(relativePosition, element);
+          }
+
+          element.trigger(createTouchEvent("touchmove", pagePosition));
+        }
+
+        function simulateTouchEndWithRespectTo(element, relativePosition) {
+          element.trigger(createTouchEvent("touchend", calcAbsolutePagePosition(relativePosition, element)));
+        }
+
+        beforeEach(function() {
+          simulateTouchStartWithRespectTo(drawingArea, startingPosition);
+        });
+
+        it("should draw a line.", function() {
+          var elements = getElementsOnPaper(paper);
+          var pathOfLine = elements[0];
+          expect(elements.length).to.equal(1);
+          expect(pathOfLine.attr()).to.have.property("path");
+        });
+
+        describe("and lets go without moving,", function() {
+          beforeEach(function() {
+            simulateTouchEndWithRespectTo(drawingArea, startingPosition);
+          });
+          it("should delete the line.", function() {
+            expect(getElementsOnPaper(paper).length).to.equal(0);
+          });
+        });
+
+        describe("and then starts to touch with two fingers", function() {
+          beforeEach(function() {
+            simulateTouchMoveWithRespectTo(drawingArea, [endingPosition, secondTouchPosition]);
+          });
+          it("should cancel drawing the line.", function() {
+            expect(getElementsOnPaper(paper).length).to.equal(0);
+          });
+        });
+      });
+    }
+
   });
 
   function getElementsOnPaper(paper) {
