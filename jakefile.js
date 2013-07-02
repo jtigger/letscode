@@ -9,7 +9,7 @@ var path = require("path");
 var supportedBrowsers = [
 //  "IE 7.0 (Windows)",
   "Chrome 27.0 (Windows)",
-  "Firefox 21.0 (Windows)",
+  "Firefox 2[12].0 (Windows)",
   "IE 8.0 (Windows)",
   "Chrome 27.0 (Mac)",
   "Firefox 21.0 (Mac)",
@@ -148,7 +148,7 @@ task("test.unit.client", [], function() {
       fail("Client-side tests failed (see above).");
     }
     supportedBrowsers.forEach(function(supportedBrowser) {
-      if (results.indexOf(supportedBrowser) === -1) {
+      if (results.match(supportedBrowser)) {
         fail("Client-side tests were not run against " + supportedBrowser + " as is required.");
       }
     });

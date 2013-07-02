@@ -17,17 +17,17 @@ wwp = {};
     var paperContainer = $(containerElementId);
 
     paper = new Raphael(containerElementId);
-    registerMouseEventHandlersForDrawingLines(containerElementId, paperContainer);
+    registerEventHandlersForDrawingLines(containerElementId, paperContainer);
     paperContainer.onselectstart = function() {
       return false;
     };
     return paper;
   };
 
-  function registerMouseEventHandlersForDrawingLines(containerElementId, paperContainer) {
+  function registerEventHandlersForDrawingLines(containerElementId, paperContainer) {
     var draftLine = null;
 
-    $(containerElementId).mousedown(function(event) {
+    function startDrawingLine(event) {
       var positionWithinCanvas;
 
       if (!draftLine) {
@@ -36,23 +36,13 @@ wwp = {};
         draftLine.attr("stroke-opacity", "0.1");
       }
       event.preventDefault();  // to avoid user selecting elements off the Paper.
-    });
-
-    // In all other browsers, preventing the default browser behavior on "mousedown" events is sufficient to
-    // prevent the user from inadvertently selecting elements outside of Paper.
-    // IE 8.0's event model is different.  That behavior is covered by the "selectstart" event.
-    $(containerElementId).on("selectstart", function(event) {
-      event.preventDefault();
-    });
-
-
-    $(containerElementId).mousemove(function(event) {
+    }
+    function adjustDraftLine(event) {
       if (draftLine) {
         setEndPoint(draftLine, calcPositionOnPaper(event, paperContainer));
       }
-    });
-
-    $(containerElementId).mouseup(function() {
+    }
+    function finishDrawingLine() {
       var path;
       var startingPointEqualsEndingPoint;
 
@@ -66,13 +56,48 @@ wwp = {};
         }
         draftLine = null;
       }
-    });
-
-    $(containerElementId).mouseleave(function() {
+    }
+    function cancelDrawingLine() {
       if (draftLine) {
         draftLine.remove();
         draftLine = null;
       }
+    }
+
+    $(containerElementId).mousedown(function(event) {
+      startDrawingLine(event);
+    });
+
+    // In all other browsers, preventing the default browser behavior on "mousedown" events is sufficient to
+    // prevent the user from inadvertently selecting elements outside of Paper.
+    // IE 8.0's event model is different.  That behavior is covered by the "selectstart" event.
+    $(containerElementId).on("selectstart", function(event) {
+      event.preventDefault();
+    });
+
+    $(containerElementId).mousemove(function(event) {
+      adjustDraftLine(event);
+    });
+
+    $(containerElementId).mouseup(function() {
+      finishDrawingLine();
+    });
+
+    $(containerElementId).mouseleave(function() {
+      cancelDrawingLine();
+    });
+
+    $(containerElementId).on("touchstart", function(event) {
+       startDrawingLine(event.originalEvent);
+    });
+    $(containerElementId).on("touchmove", function(event) {
+      adjustDraftLine(event.originalEvent);
+    });
+    $(containerElementId).on("touchend", function() {
+      finishDrawingLine();
+    });
+    $(containerElementId).on("touchcancel", function() {
+      cancelDrawingLine();
     });
 
 
