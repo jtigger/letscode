@@ -67,10 +67,6 @@ wwp = {};
       displayEventInfo("touchcancel", event.originalEvent);
     });
 
-//    $(containerElementId).mousedown(function(event) {
-//      displayEventInfo("mousedown", event.originalEvent);
-//    });
-
     function startDraw(event) {
       startPosition = { x: event.pageX - $(containerElementId).offset().left,
         y: event.pageY - $(containerElementId).offset().top};
@@ -99,6 +95,7 @@ wwp = {};
 
 //    $(containerElementId).mousedown(function(event) {
 //      startDraw(event);
+//      displayEventInfo("mousedown", event.originalEvent);
 //    });
 //
 //    $(containerElementId).mousemove(function(event) {

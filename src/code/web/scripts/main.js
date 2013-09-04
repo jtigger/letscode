@@ -1,5 +1,5 @@
 // Copyright (c) 2013 by John S. Ryan.  All rights reserved.  See LICENSE.txt for details.
-/* globals Raphael, wwp:true, $ */
+/* globals Raphael, wwp:true, $  */
 wwp = {};
 
 (function() {
@@ -37,11 +37,13 @@ wwp = {};
       }
       event.preventDefault();  // to avoid user selecting elements off the Paper.
     }
+
     function adjustDraftLine(event) {
       if (draftLine) {
         setEndPoint(draftLine, calcPositionOnPaper(event, paperContainer));
       }
     }
+
     function finishDrawingLine() {
       var path;
       var startingPointEqualsEndingPoint;
@@ -57,6 +59,7 @@ wwp = {};
         draftLine = null;
       }
     }
+
     function cancelDrawingLine() {
       if (draftLine) {
         draftLine.remove();
@@ -87,20 +90,45 @@ wwp = {};
       cancelDrawingLine();
     });
 
+    function isATouchEvent(event) {
+      return event.hasOwnProperty("originalEvent");
+    }
+
     $(containerElementId).on("touchstart", function(event) {
-       startDrawingLine(event.originalEvent);
+      if (isATouchEvent(event)) {
+        setLocationOfEventToBeLocationOfFirstTouch(event);
+        if (draftLine) {
+          adjustDraftLine(event.originalEvent);
+        } else {
+          startDrawingLine(event.originalEvent);
+        }
+      }
     });
+
     $(containerElementId).on("touchmove", function(event) {
-      adjustDraftLine(event.originalEvent);
-    });
-    $(containerElementId).on("touchend", function() {
-      finishDrawingLine();
-    });
-    $(containerElementId).on("touchcancel", function() {
-      cancelDrawingLine();
+      if (isATouchEvent(event)) {
+        setLocationOfEventToBeLocationOfFirstTouch(event);
+        adjustDraftLine(event.originalEvent);
+      }
     });
 
+    $(containerElementId).on("touchend", function(event) {
+      if (isATouchEvent(event)) {
+        setLocationOfEventToBeLocationOfFirstTouch(event);
+        finishDrawingLine();
+      }
+    });
+    $(containerElementId).on("touchcancel", function(event) {
+      if (isATouchEvent(event)) {
+        setLocationOfEventToBeLocationOfFirstTouch(event);
+        cancelDrawingLine();
+      }
+    });
+  }
 
+  function setLocationOfEventToBeLocationOfFirstTouch(event) {
+    event.originalEvent.pageX = event.originalEvent.touches[0].pageX;
+    event.originalEvent.pageY = event.originalEvent.touches[0].pageY;
   }
 
   /**
@@ -159,4 +187,5 @@ wwp = {};
     return pathValues;
   }
 
-})();
+})
+  ();
