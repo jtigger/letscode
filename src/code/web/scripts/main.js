@@ -152,9 +152,34 @@ wwp = {};
     var leftPadding = parseInt(paperContainer.css("padding-left"), 10);
     var topPadding = parseInt(paperContainer.css("padding-top"), 10);
 
-    return { x: absolutePosition.pageX - positionOfContainerOnPage.x - leftPadding,
-      y: absolutePosition.pageY - positionOfContainerOnPage.y - topPadding };
+// this is how it SHOULD be.  Accessing these properties with this notation returns 0.
+//    var pageX = absolutePosition.pageX;
+//    var pageY = absolutePosition.pageY;
+
+    // I think I'm gonna vomit...
+    function getProperty(obj, property) {
+      var prop;
+      var value;
+      for (prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+          if(prop === property) {
+            value = obj[prop];
+          }
+        }
+      }
+      return value;
+    }
+
+    // stupified why this approach works, but not the dot notation.  wtf?
+    var pageX = getProperty(absolutePosition, "pageX");
+    var pageY = getProperty(absolutePosition, "pageY");
+
+    var positionOnPaper = { x: pageX - positionOfContainerOnPage.x - leftPadding,
+      y: pageY - positionOfContainerOnPage.y - topPadding };
+
+    return positionOnPaper;
   }
+
 
   function setEndPoint(path, position) {
     var attrs = path.attr();

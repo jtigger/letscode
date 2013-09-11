@@ -185,7 +185,7 @@
 
         var startingPosition = {x: 100, y: 10};
 //        var endingPosition = {x: 200, y: 20};
-        var secondTouchPosition = {x: 10, y: 10};
+        var secondTouchPosition = {x: 22, y: 222};
 
         beforeEach(function() {
           simulateTouchStartWithRespectTo(drawingArea, startingPosition);
@@ -194,9 +194,13 @@
         it("should draw a line.", function() {
           var elements = getElementsOnPaper(paper);
           var pathOfLine = elements[0];
+
           expect(elements.length).to.equal(1);
           expect(pathOfLine.attr()).to.have.property("path");
 
+          var pathValue = pathAsArray(pathOfLine.attr().path);
+          var endpointOfLine = {x: pathValue[1][1], y: pathValue[1][2]};
+          expect(endpointOfLine).to.eql(startingPosition);
         });
 
         describe("and lets go without moving,", function() {
@@ -212,6 +216,7 @@
           beforeEach(function() {
             simulateTouchStartWithRespectTo(drawingArea, [startingPosition, secondTouchPosition]);
           });
+
           it("should continue to track the first finger and ignore the second.", function() {
             var endpointOfLine;
             var pathOfLine = getElementsOnPaper(paper)[0];
@@ -238,7 +243,7 @@
   }
 
   function browserDoesSupportTouchEvents() {
-    return typeof TouchEvent !== "undefined";
+    return 'ontouchend' in document;
   }
 
   /**
@@ -369,7 +374,7 @@
 //    for (prop in obj) {
 //      if (obj.hasOwnProperty(prop)) {
 //        objAsString += prop + " = ";
-//        if (prop === "attrs" || prop === "originalEvent" || prop === "touches" ) {
+//        if (prop === "attrs" || prop === "originalEvent" || prop === "touches" || obj[prop] instanceof Touch ) {
 //          objAsString += "{ " + objectToString(obj[prop]) + " }";
 //        } else {
 //          objAsString += obj[prop] + ";  ";
