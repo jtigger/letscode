@@ -8,3 +8,9 @@ node_modules
 
 # Ignore any generated output from the build
 /build
+
+# Ignore the videos
+/vids
+
+# Mac OS metadata
+.DS_Store

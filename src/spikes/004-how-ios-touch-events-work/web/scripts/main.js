@@ -12,6 +12,12 @@ wwp = {};
   wwp.initializeDrawingArea = function(containerElementId) {
     paper = new Raphael(containerElementId);
 
+    function isDOMElement(object) {
+      return object instanceof Window ||
+             object instanceof HTMLDivElement ||
+             object instanceof SVGSVGElement;
+    }
+
     function objectToHtml(object) {
       var propName;
       var html = "";
@@ -21,6 +27,9 @@ wwp = {};
         if (object.hasOwnProperty(propName)) {
           html += "<li>" + propName + " = ";
           html += object[propName];
+          if(object[propName] instanceof Object && !isDOMElement(object[propName])) {
+            html += "{" + objectToHtml(object[propName]) + "}";
+          }
           html += "</li>";
         }
       }
@@ -58,10 +67,6 @@ wwp = {};
       displayEventInfo("touchcancel", event.originalEvent);
     });
 
-//    $(containerElementId).mousedown(function(event) {
-//      displayEventInfo("mousedown", event.originalEvent);
-//    });
-
     function startDraw(event) {
       startPosition = { x: event.pageX - $(containerElementId).offset().left,
         y: event.pageY - $(containerElementId).offset().top};
@@ -90,6 +95,7 @@ wwp = {};
 
 //    $(containerElementId).mousedown(function(event) {
 //      startDraw(event);
+//      displayEventInfo("mousedown", event.originalEvent);
 //    });
 //
 //    $(containerElementId).mousemove(function(event) {

@@ -9,8 +9,7 @@ Minimum Marketable Feature:
 - collaborative painting wiki
 
 User Stories:
-[ ] Spike how iTouch events work.
-[ ] "Draw a Line" (via touch)
+[ ] "Handle multi-finger touching."
 [ ] "Draw multiple lines"
 [ ] "Abort line-draw" (when user hits Esc)
 
@@ -23,6 +22,8 @@ Future Ideas:
 [ ] set time limits for tests.
 
 DONE:
+[x] "Draw a Line" (via touch)
+[x] Spike how iTouch events work.
 [x] "Draw a Line with 'draw-help'"
 [x] "Draw a Line" (via mouse)
     [x] refactor setup code in tests
