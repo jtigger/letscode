@@ -11,3 +11,6 @@ node_modules
 
 # Ignore the videos
 /vids
+
+# Mac OS metadata
+.DS_Store
